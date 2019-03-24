@@ -120,7 +120,9 @@ const styles = theme => ({
 });
 
 const iconGoogle = require('../../Assets/Images/Google__G__Logo.png');
-const logo = require('../../Assets/Images/cao_gato_limpo_250x220.png');
+// const logo = require('../../Assets/Images/cao_gato_limpo_250x220.png');
+const logo = require('../../Assets/Images/logo_art_sem_fundo.png');
+// 3d495f
 
 class LoginPage extends Component {
   constructor(props) {
@@ -211,8 +213,8 @@ class LoginPage extends Component {
           <div className={classes.container}>
             {/* <form onSubmit={handleSubmit(this.onSubmit)}> */}
             <div className={classes.containerTitle}>
-              <img src={logo} alt="Adota Ai" />
-              <h1 className={classes.title}>Adota ai!</h1>
+              <img src={logo} alt="Invest-Futuro" />
+              <h1 className={classes.title}>Invest-Futuro!</h1>
             </div>
             <Paper className={classes.rootPaper} elevation={2}>
               <Field

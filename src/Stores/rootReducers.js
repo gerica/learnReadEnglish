@@ -2,7 +2,7 @@
 import { combineReducers } from 'redux';
 import { reducer as reduxFormReducer } from 'redux-form';
 import sessionReducer from './Session/reducer';
-import petReducer from './Pet/reducer';
+import bolsaAcoesReducer from './BolsaAcoes/reducer';
 
 /**
  * Creates the main reducer with the asynchronously loaded ones
@@ -10,7 +10,7 @@ import petReducer from './Pet/reducer';
 export default function createReducer() {
   return combineReducers({
     form: reduxFormReducer,
-    pet: petReducer,
+    bolsaAcoes: bolsaAcoesReducer,
     session: sessionReducer
   });
 }

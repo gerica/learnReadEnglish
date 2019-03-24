@@ -3,23 +3,17 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
   InputAdornment,
-  IconButton,
   FormControl,
   InputLabel,
   Input,
-  FormHelperText,
-  Icon
+  FormHelperText
 } from '@material-ui/core';
-import { AccountCircle, VisibilityOff, Visibility } from '@material-ui/icons';
+import { DateRange } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
   margin: {
     margin: theme.spacing.unit
-  },
-  icon: {
-    marginLeft: 11,
-    marginRight: 12
   }
 });
 
@@ -39,43 +33,15 @@ class TextInputBase extends Component {
   }
 
   renderAdornment() {
-    const {
-      showPassword,
-      typeField,
-      adornment,
-      handleClickShowPassword,
-      classes,
-      adornmentIcon
-    } = this.props;
+    const { adornment } = this.props;
 
-    if (!adornment && !adornmentIcon) {
+    if (!adornment) {
       return null;
     }
 
-    if (adornmentIcon) {
-      return (
-        <InputAdornment position="end">
-          <Icon className={classes.icon}>{adornmentIcon}</Icon>
-        </InputAdornment>
-      );
-    }
-
-    if (typeField === 'text') {
-      return (
-        <InputAdornment position="end">
-          <AccountCircle className={classes.icon} />
-        </InputAdornment>
-      );
-    }
-
     return (
-      <InputAdornment position="end">
-        <IconButton
-          aria-label="Toggle password visibility"
-          onClick={handleClickShowPassword}
-        >
-          {showPassword ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
+      <InputAdornment position="start">
+        <DateRange style={{ marginRight: 3 }} />
       </InputAdornment>
     );
   }
@@ -102,11 +68,12 @@ class TextInputBase extends Component {
         <Input
           id={idComponent}
           value={value}
-          type={this.getType()}
+          type="date"
           aria-describedby="component-error-text"
           {...inputProps}
           endAdornment={this.renderAdornment()}
         />
+
         {touched && (
           <FormHelperText id="component-error-text">{error}</FormHelperText>
         )}
@@ -121,7 +88,6 @@ TextInputBase.propTypes = {
   showPassword: PropTypes.bool,
   typeField: PropTypes.string,
   adornment: PropTypes.bool,
-  adornmentIcon: PropTypes.string,
   handleClickShowPassword: PropTypes.func
 };
 
@@ -130,7 +96,6 @@ TextInputBase.defaultProps = {
   typeField: 'text',
   adornment: false,
   className: '',
-  adornmentIcon: null,
   handleClickShowPassword: () => {}
 };
 

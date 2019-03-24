@@ -1,39 +1,30 @@
 /* eslint-disable prefer-destructuring */
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import {
-  Card,
-  CardHeader,
-  Button,
-  CardContent,
-  Typography,
-  CardActions,
-  Icon,
-  Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from '@material-ui/core';
+import { Card, CardHeader, CardContent, Typography } from '@material-ui/core';
 // import classnames from 'classnames';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
 
-import * as selectors from '../../Stores/Pet/selector';
-import PetActions from '../../Stores/Pet/actions';
+import * as selectors from '../../Stores/BolsaAcoes/selector';
+import BolsaAcoesActions from '../../Stores/BolsaAcoes/actions';
 import CustomizedProgress from '../../Components/Progress/CustomizedProgress';
-import { getMiniatura } from '../../Assets/Images';
 import { ViewCards } from './styles';
 import CustomizedSnackbars from '../../Components/Snackbars/CustomizedSnackbars';
-import MyTheme from '../../muiTheme';
+import TitlePage from '../../Components/AppBar/TitlePage';
+import Routes from '../../Utils/routes';
 
 const styles = theme => ({
+  root: {
+    width: '100%',
+    overflowX: 'auto'
+  },
   card: {
-    maxWidth: 400,
-    width: 350,
-    height: 210,
+    // maxWidth: 400,
+    width: 200,
+    height: 260,
     margin: 5
   },
   media: {
@@ -59,22 +50,11 @@ const styles = theme => ({
   }
 });
 
-// import AdaptingHook from '../../Components/Button/AdaptingHook';
-// import { Container } from './styles';
-
 class HomePage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      open: false,
-      selectedObj: null
-    };
-  }
-
   componentWillMount() {
-    const { fetchPetAbertoRequest, reset } = this.props;
-    fetchPetAbertoRequest();
-    reset();
+    // const { fetchCotacaoRequest, reset } = this.props;
+    // fetchCotacaoRequest('ABEV3.SA');
+    // reset();
   }
 
   getRacaDescricao(raca) {
@@ -84,34 +64,8 @@ class HomePage extends Component {
     return '';
   }
 
-  getAvatar(doador) {
-    const { classes } = this.props;
-    if (!doador) {
-      return <Icon type="MaterialIcons" name="pets" />;
-    }
-    const objImg = getMiniatura(doador);
-    if (objImg) {
-      return (
-        <Avatar
-          aria-label="Recipe"
-          className={classes.avatar}
-          src={objImg.img}
-        />
-      );
-    }
-    return <Icon type="MaterialIcons" name="pets" />;
-  }
-
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }));
-  };
-
-  handleClickOpen = obj => {
-    this.setState({ open: true, selectedObj: obj });
-  };
-
-  handleClose = () => {
-    this.setState({ open: false, selectedObj: null });
   };
 
   handleWhatsApp = contato => {
@@ -122,109 +76,79 @@ class HomePage extends Component {
     }
   };
 
-  renderDialogView() {
-    const { classes } = this.props;
-    const { open, selectedObj } = this.state;
-
-    if (!selectedObj) {
-      return null;
-    }
-
-    const { user } = selectedObj;
-    let contato;
-    if (user) {
-      contato = user.contato;
-    }
-
-    return (
-      <div>
-        <Dialog
-          open={open}
-          onClose={this.handleClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">Adotar esse pet.</DialogTitle>
-          <DialogContent>
-            <Card className={classes.card}>
-              <CardHeader
-                avatar={this.getAvatar(selectedObj)}
-                title={this.getRacaDescricao(selectedObj.raca)}
-              />
-
-              <CardContent>
-                <Typography component="p">Nome: {selectedObj.nome}</Typography>
-                <Typography component="p">
-                  Doador: {selectedObj.user && selectedObj.user.name}
-                </Typography>
-              </CardContent>
-              <CardActions className={classes.actions} disableActionSpacing>
-                <Button
-                  variant="contained"
-                  style={MyTheme.palette.success}
-                  className={classes.button}
-                  onClick={() => this.handleWhatsApp(contato)}
-                >
-                  Contactar
-                  <Icon className={classes.rightIcon}>arrow_forward</Icon>
-                </Button>
-              </CardActions>
-            </Card>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Fechar
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
-  }
-
   renderCards() {
-    const { classes, listaPetAberto } = this.props;
+    const { classes, listaCotacaoDia } = this.props;
+    const routerHome = Routes.find(r => r.order === 1);
 
-    let cards;
+    const GlobalQuote = listaCotacaoDia['Global Quote'];
+    //     01. symbol: "MSFT"
+    // 02. open: "119.5000"
+    // 03. high: "119.5890"
+    // 04. low: "117.0400"
+    // 05. price: "117.0500"
+    // 06. volume: "33624528"
+    // 07. latest trading day: "2019-03-22"
+    // 08. previous close: "120.2200"
+    // 09. change: "-3.1700"
+    // 10. change percent: "-2.6368%"
 
-    if (listaPetAberto && listaPetAberto.length > 0) {
-      cards = listaPetAberto.map((obj, index) => (
-        <Card className={classes.card} key={index}>
-          <CardHeader
-            avatar={this.getAvatar(obj)}
-            title={this.getRacaDescricao(obj.raca)}
-          />
+    if (listaCotacaoDia) {
+      return (
+        <div className={classes.root}>
+          <TitlePage routerMain={routerHome} />
 
-          <CardContent>
-            <Typography component="p">Nome: {obj.nome}</Typography>
-            <Typography component="p">
-              Doador: {obj.user && obj.user.name}
-            </Typography>
-          </CardContent>
-          <CardActions className={classes.actions} disableActionSpacing>
+          <Card className={classes.card}>
+            <CardHeader title={`Papel: ${GlobalQuote['01. symbol']}`} />
+
+            <CardContent>
+              <Typography component="div">
+                Abertura: {GlobalQuote['02. open']}
+              </Typography>
+              <Typography component="div">
+                Máximo: {GlobalQuote['03. high']}
+              </Typography>
+              <Typography component="div">
+                Mínimo: {GlobalQuote['04. low']}
+              </Typography>
+              <Typography component="div">
+                Volume: {GlobalQuote['06. volume']}
+              </Typography>
+              <Typography component="div">
+                Dia: {GlobalQuote['07. latest trading day']}
+              </Typography>
+              <Typography component="div">
+                Fechamento: {GlobalQuote['08. previous close']}
+              </Typography>
+              <Typography component="div">
+                Variação: {GlobalQuote['09. change']}
+              </Typography>
+              <Typography component="div">
+                Variação(%): {GlobalQuote['10. change percent']}
+              </Typography>
+            </CardContent>
+            {/* <CardActions className={classes.actions} disableActionSpacing>
             <Button
               variant="contained"
               style={MyTheme.palette.success}
               className={classes.button}
-              onClick={() => this.handleClickOpen(obj)}
+              // onClick={() => this.handleClickOpen(obj)}
             >
               Ver
-              {/* This Button uses a Font Icon, see the installation instructions in the docs. */}
               <Icon className={classes.rightIcon}>arrow_forward</Icon>
             </Button>
-          </CardActions>
-        </Card>
-      ));
+          </CardActions> */}
+          </Card>
+        </div>
+      );
     }
 
-    return cards;
+    return null;
   }
 
   render() {
     const { loading, error } = this.props;
-
     return (
       <Fragment>
-        {this.renderDialogView()}
-        {/* <CustomizedSnackbars message="teste" variant="success" /> */}
         {error ? (
           <CustomizedSnackbars message={error.message} variant="error" />
         ) : null}
@@ -236,29 +160,30 @@ class HomePage extends Component {
 }
 
 HomePage.propTypes = {
-  fetchPetAbertoRequest: PropTypes.func,
+  fetchCotacaoRequest: PropTypes.func,
   loading: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  // listaPetAberto: PropTypes.checkPropTypes(PropTypes.array),
+  // listaCotacaoDia: PropTypes.checkPropTypes(PropTypes.array),
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 };
 
 HomePage.defaultProps = {
-  fetchPetAbertoRequest: null,
+  fetchCotacaoRequest: null,
   loading: null,
-  // listaPetAberto: [],
+  // listaCotacaoDia: [],
   error: null
 };
 
 const mapStateToProps = createStructuredSelector({
-  listaPetAberto: selectors.selectorListaPetAberto(),
+  listaCotacaoDia: selectors.selectorListaCotacaoDia(),
   // form: selectors.selectorForm(),
   loading: selectors.selectorLoading(),
   error: selectors.selectorError()
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchPetAbertoRequest: () => dispatch(PetActions.fetchPetAbertoRequest()),
-  reset: () => dispatch(PetActions.resetRedux())
+  fetchCotacaoRequest: papel =>
+    dispatch(BolsaAcoesActions.fetchCotacaoRequest(papel)),
+  reset: () => dispatch(BolsaAcoesActions.resetRedux())
 });
 
 const HomePageRedux = connect(

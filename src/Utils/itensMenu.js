@@ -11,6 +11,12 @@ const menus = [
   },
   {
     order: 2,
+    name: 'Carteira',
+    to: '/carteira',
+    icon: <AccountBox />
+  },
+  {
+    order: 3,
     name: 'Perfil',
     to: '/perfil',
     icon: <AccountBox />

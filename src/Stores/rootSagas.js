@@ -1,16 +1,15 @@
 import { all } from 'redux-saga/effects';
 import * as sessionSaga from './Session/saga';
-import * as petSaga from './Pet/saga';
+import * as bolsaAcoesSaga from './BolsaAcoes/saga';
 
 // notice how we now only export the rootSaga
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
   yield all([
-    petSaga.watchCadastroDoacaoRequest(),
-    petSaga.watchFetchPetPorUserRequest(),
-    petSaga.watchFetchPetAbertoRequest(),
-    petSaga.watchUpdateDoacaoRequest(),
-    petSaga.watchUpdateDoacaoInfoRequest(),
+    bolsaAcoesSaga.watchFetchCotacaoRequest(),
+    bolsaAcoesSaga.watchSavePapelRequest(),
+    bolsaAcoesSaga.watchfetchPapeisPorUserRequest(),
+    bolsaAcoesSaga.watchDeletePapelRequest(),
 
     sessionSaga.watchLoginRequest(),
     sessionSaga.watchSignInGoogleRequest(),

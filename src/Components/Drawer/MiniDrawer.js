@@ -283,13 +283,13 @@ class MiniDrawer extends React.Component {
   renderMenuSidebar() {
     const { user } = this.props;
     const routesFilter = routes.filter(r => {
-      if (r.order === 2) {
-        // eslint-disable-next-line no-unneeded-ternary
-        return user ? true : false;
-      }
-      if (r.order === 3) {
+      if (r.order === 99) {
         // eslint-disable-next-line no-unneeded-ternary
         return user ? false : true;
+      }
+      if (r.order !== 1) {
+        // eslint-disable-next-line no-unneeded-ternary
+        return user ? true : false;
       }
       return true;
     });
@@ -375,7 +375,7 @@ class MiniDrawer extends React.Component {
               noWrap
             >
               {' '}
-              Adota Aí
+              Investimento para o Futuro
             </Typography>
             <div className={classes.search}>
               <div className={classes.searchIcon}>

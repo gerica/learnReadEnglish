@@ -1,8 +1,14 @@
-import { Home, AccountCircle } from '@material-ui/icons';
+import { Home, AccountCircle, AccountBalanceWallet } from '@material-ui/icons';
 import HomePage from '../Containers/Home';
 import ProfilPage from '../Containers/Perfil';
 import LoginPage from '../Containers/Login';
-import { ROUTER_HOME, ROUTER_PERFIL, ROUTER_LOGIN } from './constants';
+import CarteiraPage from '../Containers/Carteira';
+import {
+  ROUTER_HOME,
+  ROUTER_PERFIL,
+  ROUTER_LOGIN,
+  ROUTER_CARTEIRA
+} from './constants';
 
 const Routes = [
   {
@@ -16,6 +22,15 @@ const Routes = [
   },
   {
     order: 2,
+    path: ROUTER_CARTEIRA,
+    sidebarName: 'Cateira',
+    navbarName: 'Carteira',
+    icon: AccountBalanceWallet,
+    component: CarteiraPage,
+    selected: false
+  },
+  {
+    order: 3,
     path: ROUTER_PERFIL,
     sidebarName: 'Perfil',
     navbarName: 'Perfil',
@@ -24,7 +39,7 @@ const Routes = [
     selected: false
   },
   {
-    order: 3,
+    order: 99,
     path: ROUTER_LOGIN,
     sidebarName: 'Login',
     navbarName: 'Login',
