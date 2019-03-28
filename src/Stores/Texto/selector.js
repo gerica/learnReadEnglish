@@ -1,37 +1,32 @@
 import { createSelector } from 'reselect';
 
-const storePet = state => state.pet;
+const storeLocal = state => state.texto;
 const storeForm = state => state.form;
 
-const selectorListaPetPorUser = () =>
-  createSelector(
-    storePet,
-    store => store.listaPetPorUser
-  );
-const selectorListaPetAberto = () =>
-  createSelector(
-    storePet,
-    store => store.listaPetAberto
-  );
 const selectorLoading = () =>
   createSelector(
-    storePet,
+    storeLocal,
     store => store.loading
   );
 const selectorError = () =>
   createSelector(
-    storePet,
+    storeLocal,
     store => store.error
   );
 const selectorMessage = () =>
   createSelector(
-    storePet,
+    storeLocal,
     store => store.message
   );
-const selectorDone = () =>
+const selectorListWords = () =>
   createSelector(
-    storePet,
-    store => store.done
+    storeLocal,
+    store => store.listWords
+  );
+const selectorText = () =>
+  createSelector(
+    storeLocal,
+    store => store.text
   );
 
 const selectorForm = () =>
@@ -45,7 +40,6 @@ export {
   selectorLoading,
   selectorError,
   selectorMessage,
-  selectorListaPetPorUser,
-  selectorListaPetAberto,
-  selectorDone
+  selectorListWords,
+  selectorText,
 };

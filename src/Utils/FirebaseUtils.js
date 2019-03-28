@@ -1,12 +1,12 @@
 import firebase from 'firebase';
 
 const config = {
-  apiKey: 'AIzaSyBIJXKC8fukznbss6bjLJZdtiWmOrgUt_Q',
-  authDomain: 'invest-futuro.firebaseapp.com',
-  databaseURL: 'https://invest-futuro.firebaseio.com',
-  projectId: 'invest-futuro',
-  storageBucket: 'invest-futuro.appspot.com',
-  messagingSenderId: '909060958999'
+  apiKey: "AIzaSyCiqlUC6KaeGpUByMU2-c0_INCgIn6so5k",
+  authDomain: "learnreadenglish.firebaseapp.com",
+  databaseURL: "https://learnreadenglish.firebaseio.com",
+  projectId: "learnreadenglish",
+  storageBucket: "learnreadenglish.appspot.com",
+  messagingSenderId: "198650835278"
 };
 
 const firebaseApp = firebase.initializeApp(config);

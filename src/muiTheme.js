@@ -1,9 +1,10 @@
+/* eslint-disable linebreak-style */
 import { createMuiTheme } from '@material-ui/core/styles';
-import { green, blue, red, amber } from '@material-ui/core/colors';
+import { green, blueGrey, red, amber } from '@material-ui/core/colors';
 
 export default createMuiTheme({
   palette: {
-    primary: { main: blue[600] },
+    primary: { main: blueGrey[600] },
     success: {
       backgroundColor: green[500],
       color: 'white'

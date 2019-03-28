@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -210,34 +211,8 @@ class MiniDrawer extends React.Component {
     const isMenuOpen = Boolean(anchorEl);
     const menus = [];
 
-    if (user) {
-      const routePerfil = routes.find(e => e.order === 2);
-      menus.push(
-        <MenuItem
-          key={3}
-          onClick={() => {
-            this.onClickLink(routePerfil);
-            this.handleMenuClose();
-          }}
-          component={Link}
-          to={routePerfil.path}
-        >
-          Perfil
-        </MenuItem>
-      );
-      menus.push(
-        <MenuItem
-          key={2}
-          onClick={() => {
-            this.onSignOutRequest();
-            this.handleMenuClose();
-          }}
-        >
-          Logout
-        </MenuItem>
-      );
-    } else {
-      const routeLogin = routes.find(e => e.order === 3);
+    if (!user) {     
+      const routeLogin = routes.find(e => e.order === 99);
       menus.push(
         <MenuItem
           key={3}
@@ -375,7 +350,7 @@ class MiniDrawer extends React.Component {
               noWrap
             >
               {' '}
-              Investimento para o Futuro
+              Learn Read English
             </Typography>
             <div className={classes.search}>
               <div className={classes.searchIcon}>

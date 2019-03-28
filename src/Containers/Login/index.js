@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 import React, { Component } from 'react';
 import { Button, Avatar, Paper, CircularProgress } from '@material-ui/core';
 import { Field, reduxForm } from 'redux-form';
