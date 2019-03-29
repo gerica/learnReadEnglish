@@ -20,6 +20,7 @@ import {
   DialogActions
 } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
+import ListaPalavrasPage from './list';
 
 import * as selectorsSession from '../../Stores/Session/selector';
 import SessionActions from '../../Stores/Session/actions';
@@ -222,6 +223,11 @@ class PerfilPage extends React.Component {
           </Tabs>
         </AppBar>
         {value === 0 && <TabContainer>{this.renderInfoUser()}</TabContainer>}
+        {value === 1 && (
+          <TabContainer>
+            <ListaPalavrasPage />
+          </TabContainer>
+        )}
 
         {this.renderDialogEdit()}
       </div>

@@ -1,6 +1,17 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardHeader, CardContent, CardActions, Button, CircularProgress, Icon, IconButton, Tooltip, Typography } from '@material-ui/core';
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardActions,
+  Button,
+  CircularProgress,
+  Icon,
+  IconButton,
+  Tooltip,
+  Typography
+} from '@material-ui/core';
 import { Field, reduxForm } from 'redux-form';
 // import classnames from 'classnames';
 import { connect } from 'react-redux';
@@ -63,7 +74,6 @@ class HomePage extends Component {
     // const { fetchCotacaoRequest, reset } = this.props;
     // fetchCotacaoRequest('ABEV3.SA');
     // reset();
-
     // const { initialize } = this.props;
     // // moment.to;
     // initialize({
@@ -71,13 +81,12 @@ class HomePage extends Component {
     // });
   }
 
-  
-  onSubmit = (values) =>{
+  onSubmit = values => {
     const { onCompileTextWords, user } = this.props;
-    
-    onCompileTextWords({values, user});
-  }
-  
+
+    onCompileTextWords({ values, user });
+  };
+
   getRacaDescricao(raca) {
     if (raca) {
       return raca.length > 100 ? `${raca.substr(0, 10)}...` : raca;
@@ -89,98 +98,110 @@ class HomePage extends Component {
     this.setState(state => ({ expanded: !state.expanded }));
   };
 
-  handleDoneText = (word)=>{
+  handleDoneText = word => {
     const { onDoneTextWordsRequest, user } = this.props;
-    onDoneTextWordsRequest({ word, user });    
-  }
+    onDoneTextWordsRequest({ word, user });
+  };
 
   renderCards() {
     const { classes, handleSubmit, loading, text } = this.props;
     const routerHome = Routes.find(r => r.order === 1);
-    
-      return (
-        <div className={classes.root}>
-          <TitlePage routerMain={routerHome} />
-        <div style={{display: 'flex'}}>  
-          <Card className={classes.card} style={{width: '50%'}}>
-            <CardHeader title='Text for compiler' />
+
+    return (
+      <div className={classes.root}>
+        <TitlePage routerMain={routerHome} />
+        <div style={{ display: 'flex' }}>
+          <Card className={classes.card} style={{ width: '50%' }}>
+            <CardHeader title="Text for compiler" />
             <CardContent>
               <Field
                 name="texto"
                 label="Texto"
                 className={classes.textField}
-                required     
+                required
                 multiline
-                rowsMax="10"           
+                rowsMax="10"
                 adornmentIcon="textsms"
                 component={TextInputBase}
-              />              
-            </CardContent> 
+              />
+            </CardContent>
             <CardActions>
-              <Button variant="contained" size="small" color="primary" onClick={handleSubmit(this.onSubmit)} disabled={loading}>
+              <Button
+                variant="contained"
+                size="small"
+                color="primary"
+                onClick={handleSubmit(this.onSubmit)}
+                disabled={loading}
+              >
                 Compilar
-              </Button>   
+              </Button>
               {loading && (
-                  <CircularProgress
-                    size={24}
-                    className={classes.buttonProgress}
-                  />
-                )}          
-            </CardActions>          
+                <CircularProgress
+                  size={24}
+                  className={classes.buttonProgress}
+                />
+              )}
+            </CardActions>
           </Card>
-          <Card className={classes.card} style={{width: '50%'}}>
-            <CardHeader title='Text' />
-            <CardContent>
-              {text}
-            </CardContent> 
-            
+          <Card className={classes.card} style={{ width: '50%' }}>
+            <CardHeader title="Text" />
+            <CardContent>{text}</CardContent>
           </Card>
-          </div>
         </div>
-      );
-    
+      </div>
+    );
   }
 
-  renderWordsCard(){
+  renderWordsCard() {
     const { listWords, classes } = this.props;
 
-    if(!listWords){
+    if (!listWords) {
       return null;
     }
-    if(listWords.length===0){
-      return(
+    if (listWords.length === 0) {
+      return (
         <Card className={classes.card}>
           <CardContent>
-            <Typography component="p">Congratulations you know all words, nice !!!</Typography>
-          </CardContent> 
+            <Typography component="p">
+              Congratulations you know all words, nice !!!
+            </Typography>
+          </CardContent>
         </Card>
-         );
+      );
     }
 
-    const cards =listWords.map((w , index)=>
+    const cards = listWords.map((w, index) => (
       <Card className={classes.card} key={index}>
-      {/* <CardHeader title='teste' /> */}
+        {/* <CardHeader title='teste' /> */}
 
-      <CardContent>
-        {w.origin} - {w.translate} 
-      </CardContent> 
-      <CardActions>
-        <Tooltip title="Já aprendi">
-            <IconButton color="primary" className={classes.button} aria-label="Add an alarm" onClick={()=>this.handleDoneText(w)}>
+        <CardContent>
+          {w.origin} - {w.translate}
+        </CardContent>
+        <CardActions>
+          <Tooltip title="Já aprendi">
+            <IconButton
+              color="primary"
+              className={classes.button}
+              aria-label="Add an alarm"
+              onClick={() => this.handleDoneText(w)}
+            >
               <Icon>done</Icon>
-            </IconButton>         
+            </IconButton>
           </Tooltip>
-        {/* <IconButton color="secondary" className={classes.button} aria-label="Add an alarm">
+          {/* <IconButton color="secondary" className={classes.button} aria-label="Add an alarm">
           <Icon>favorite_border</Icon>
         </IconButton>                          */}
-      </CardActions>          
-    </Card>
-      );
+        </CardActions>
+      </Card>
+    ));
 
     return (
-      <div className={classes.root}  style={{ display: 'flex',flexWrap: 'wrap'}}>
-         {cards}
-        </div>
+      <div
+        className={classes.root}
+        style={{ display: 'flex', flexWrap: 'wrap' }}
+      >
+        {cards}
+      </div>
     );
   }
 
@@ -207,7 +228,7 @@ HomePage.propTypes = {
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   listWords: PropTypes.array,
   user: PropTypes.object,
-  text: PropTypes.string,
+  text: PropTypes.string
 };
 
 HomePage.defaultProps = {
@@ -215,7 +236,7 @@ HomePage.defaultProps = {
   loading: null,
   // listaCotacaoDia: [],
   error: null,
-  user:null
+  user: null
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -224,10 +245,10 @@ const mapStateToProps = createStructuredSelector({
   loading: selectors.selectorLoading(),
   error: selectors.selectorError(),
   user: selectorsSession.selectorSessionUser(),
-  text: selectors.selectorText(),
+  text: selectors.selectorText()
 });
 
-const mapDispatchToProps = dispatch => ({  
+const mapDispatchToProps = dispatch => ({
   onCompileTextWords: papel =>
     dispatch(TextoActions.compileTextWordsRequest(papel)),
   onDoneTextWordsRequest: payload =>
@@ -235,14 +256,11 @@ const mapDispatchToProps = dispatch => ({
   reset: () => dispatch(TextoActions.resetRedux())
 });
 
-
 const validate = createValidator({
-  texto: [required],  
+  texto: [required]
 });
 
-const reduxHomePage = reduxForm({ form: 'perfilEditPage', validate })(
-  HomePage
-);
+const reduxHomePage = reduxForm({ form: 'perfilEditPage', validate })(HomePage);
 
 const connectHomePage = connect(
   mapStateToProps,

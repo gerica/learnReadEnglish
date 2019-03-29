@@ -2,10 +2,8 @@
 import { Home, AccountCircle } from '@material-ui/icons';
 import HomePage from '../Containers/Home';
 import LoginPage from '../Containers/Login';
-import {
-  ROUTER_HOME,
-  ROUTER_LOGIN,
-} from './constants';
+import PerfilPage from '../Containers/Perfil';
+import { ROUTER_HOME, ROUTER_LOGIN, ROUTER_PERFIL } from './constants';
 
 const Routes = [
   {
@@ -17,24 +15,15 @@ const Routes = [
     component: HomePage,
     selected: false
   },
-  // {
-  //   order: 2,
-  //   path: ROUTER_CARTEIRA,
-  //   sidebarName: 'Cateira',
-  //   navbarName: 'Carteira',
-  //   icon: AccountBalanceWallet,
-  //   component: CarteiraPage,
-  //   selected: false
-  // },
-  // {
-  //   order: 3,
-  //   path: ROUTER_PERFIL,
-  //   sidebarName: 'Perfil',
-  //   navbarName: 'Perfil',
-  //   icon: AccountCircle,
-  //   component: ProfilPage,
-  //   selected: false
-  // },
+  {
+    order: 2,
+    path: ROUTER_PERFIL,
+    sidebarName: 'Perfil',
+    navbarName: 'Perfil',
+    icon: AccountCircle,
+    component: PerfilPage,
+    selected: false
+  },
   {
     order: 99,
     path: ROUTER_LOGIN,
