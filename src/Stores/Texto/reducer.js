@@ -7,6 +7,7 @@ const INITIAL_STATE = {
   listWords: null,
   message: null,
   text: null,
+  listWordsForUserOrigin: null,
   listWordsForUser: null
 };
 
@@ -86,7 +87,29 @@ export const fetchAllWordsForUserSuccess = (
     error: null,
     loading: false,
     message,
-    listWordsForUser
+    listWordsForUser,
+    listWordsForUserOrigin: listWordsForUser
+  };
+};
+
+export const filterListWords = (state = INITIAL_STATE, { filter }) => {
+  const { listWordsForUserOrigin } = state;
+  let result;
+
+  if (filter && filter.param && filter.param.length > 0) {
+    result = listWordsForUserOrigin.filter(l => {
+      return (
+        l.word.origin.includes(filter.param) ||
+        l.word.translate.includes(filter.param) ||
+        (l.addFlashCards && filter.param === 'true')
+      );
+    });
+  } else {
+    result = listWordsForUserOrigin;
+  }
+  return {
+    ...state,
+    listWordsForUser: result
   };
 };
 
@@ -107,7 +130,8 @@ const perfilReducer = createReducer(INITIAL_STATE, {
 
   [TextoTypes.FORGET_WORD_REQUEST]: request,
   [TextoTypes.ADD_FLASH_CARD_REQUEST]: request,
-  [TextoTypes.REMOVE_FLASH_CARD_REQUEST]: request
+  [TextoTypes.REMOVE_FLASH_CARD_REQUEST]: request,
+  [TextoTypes.FILTER_LIST_WORDS]: filterListWords
 });
 
 export default perfilReducer;

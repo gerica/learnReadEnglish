@@ -18,7 +18,9 @@ const { Types, Creators } = createActions({
 
   forgetWordRequest: ['payload'],
   addFlashCardRequest: ['payload'],
-  removeFlashCardRequest: ['payload']
+  removeFlashCardRequest: ['payload'],
+
+  filterListWords: ['filter']
 });
 
 export const TextoTypes = Types;

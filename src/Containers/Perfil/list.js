@@ -19,7 +19,13 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { Card, CardContent, CardActions, Button } from '@material-ui/core';
+import {
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  TextField
+} from '@material-ui/core';
 
 import * as selectors from '../../Stores/Texto/selector';
 import * as selectorsSession from '../../Stores/Session/selector';
@@ -229,14 +235,14 @@ class ListaPalavrasPage extends React.Component {
     onForgetWord({ word: selected, user });
     this.setState({ selected: null });
   };
-  
+
   handleAddFlashCard = () => {
     const { onAddFlashCard, user } = this.props;
     const { selected } = this.state;
     onAddFlashCard({ word: selected, user });
     this.setState({ selected: null });
   };
-  
+
   handleRemoveFlashCard = () => {
     const { onRemoveFlashCard, user } = this.props;
     const { selected } = this.state;
@@ -249,21 +255,26 @@ class ListaPalavrasPage extends React.Component {
     return selected && selected.id === id;
   };
 
+  handleFiltro = event => {
+    const { onFilterListWords } = this.props;
+    onFilterListWords({ param: event.target.value });
+  };
+
   render() {
     const { classes, listWordsForUser } = this.props;
     const { order, orderBy, rowsPerPage, page, selected } = this.state;
     if (!listWordsForUser) {
       return null;
     }
-    if (listWordsForUser.length === 0) {
-      return (
-        <Card className={classes.card}>
-          <CardContent>
-            <Typography component="p">Begin to read !!!</Typography>
-          </CardContent>
-        </Card>
-      );
-    }
+    // if (listWordsForUser.length === 0) {
+    //   return (
+    //     <Card className={classes.card}>
+    //       <CardContent>
+    //         <Typography component="p">Begin to read !!!</Typography>
+    //       </CardContent>
+    //     </Card>
+    //   );
+    // }
     const emptyRows =
       rowsPerPage -
       Math.min(rowsPerPage, listWordsForUser.length - page * rowsPerPage);
@@ -277,6 +288,15 @@ class ListaPalavrasPage extends React.Component {
           >
             <Typography variant="h4"> List of word you know</Typography>
           </Paper>
+          <TextField
+            id="outlined-full-width"
+            label="Filtro"
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            value={this.state.age}
+            onChange={this.handleFiltro}
+          />
           <Paper className={classes.paper}>
             <div className={classes.tableWrapper}>
               <Table className={classes.table} aria-labelledby="tableTitle">
@@ -396,7 +416,8 @@ ListaPalavrasPage.propTypes = {
   onFetchAllWordsForUserRequest: PropTypes.func.isRequired,
   onForgetWord: PropTypes.func.isRequired,
   onAddFlashCard: PropTypes.func.isRequired,
-  onRemoveFlashCard: PropTypes.func.isRequired
+  onRemoveFlashCard: PropTypes.func.isRequired,
+  onFilterListWords: PropTypes.func.isRequired
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -414,7 +435,9 @@ const mapDispatchToProps = dispatch => ({
   onAddFlashCard: payload =>
     dispatch(TextoActions.addFlashCardRequest(payload)),
   onRemoveFlashCard: payload =>
-    dispatch(TextoActions.removeFlashCardRequest(payload))
+    dispatch(TextoActions.removeFlashCardRequest(payload)),
+  onFilterListWords: payload =>
+    dispatch(TextoActions.filterListWords(payload))
 });
 
 const connectListaPalavrasPage = connect(
