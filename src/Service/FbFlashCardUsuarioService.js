@@ -1,8 +1,8 @@
 import firebase from '../Utils/FirebaseUtils';
 
-class FbTextoUsuarioService {
+class FbFlashCardUsuarioService {
   constructor() {
-    this.ref = firebase.firestore().collection('palavraConhecida');
+    this.ref = firebase.firestore().collection('flasCardUsuario');
   }
 
   async save(payload) {
@@ -40,14 +40,11 @@ class FbTextoUsuarioService {
     try {
       const result = [];
 
-      await this.ref
-        .where('user', '==', 'aberto')
-        .get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            result.push({ id: doc.id, ...doc.data() });
-          });
+      await this.ref.get().then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          result.push({ id: doc.id, ...doc.data() });
         });
+      });
       return result;
     } catch (err) {
       throw new Error('Erro ao obter lista de pets.');
@@ -77,4 +74,4 @@ class FbTextoUsuarioService {
     return result;
   }
 }
-export default new FbTextoUsuarioService();
+export default new FbFlashCardUsuarioService();

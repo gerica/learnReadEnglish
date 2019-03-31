@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 
-const storeLocal = state => state.texto;
-const storeForm = state => state.form;
+const storeLocal = state => state.flashCard;
 
 const selectorLoading = () =>
   createSelector(
@@ -18,34 +17,27 @@ const selectorMessage = () =>
     storeLocal,
     store => store.message
   );
-const selectorListWords = () =>
+const selectorListFlasCard = () =>
   createSelector(
     storeLocal,
-    store => store.listWords
+    store => store.listFlasCard
   );
-const selectorText = () =>
+const selectorSelectedCard = () =>
   createSelector(
     storeLocal,
-    store => store.text
+    store => store.selectedCard
   );
-const selectorListWordsForUser = () =>
+const selectorShowAnswer = () =>
   createSelector(
     storeLocal,
-    store => store.listWordsForUser
-  );
-
-const selectorForm = () =>
-  createSelector(
-    storeForm,
-    form => form
+    store => store.showAnswer
   );
 
 export {
-  selectorForm,
   selectorLoading,
   selectorError,
   selectorMessage,
-  selectorListWords,
-  selectorText,
-  selectorListWordsForUser
+  selectorListFlasCard,
+  selectorSelectedCard,
+  selectorShowAnswer
 };

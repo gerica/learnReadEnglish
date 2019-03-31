@@ -12,6 +12,13 @@ const { Types, Creators } = createActions({
 
   doneTextWordsRequest: ['payload'],
   doneTextWordsSuccess: ['word'],
+
+  fetchAllWordsForUserRequest: ['payload'],
+  fetchAllWordsForUserSuccess: ['listWordsForUser', 'message'],
+
+  forgetWordRequest: ['payload'],
+  addFlashCardRequest: ['payload'],
+  removeFlashCardRequest: ['payload']
 });
 
 export const TextoTypes = Types;

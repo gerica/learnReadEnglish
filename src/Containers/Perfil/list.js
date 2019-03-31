@@ -12,28 +12,28 @@ import TableRow from '@material-ui/core/TableRow';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
+import { Card, CardContent, CardActions, Button } from '@material-ui/core';
+
+import * as selectors from '../../Stores/Texto/selector';
+import * as selectorsSession from '../../Stores/Session/selector';
+import TextoActions from '../../Stores/Texto/actions';
 import EnhancedTableHead from '../../Components/Table/EnhancedTableHead';
 
-let counter = 0;
-function createData(name, calories, fat, carbs, protein) {
-  counter += 1;
-  return { id: counter, name, calories, fat, carbs, protein };
-}
-
 function desc(a, b, orderBy) {
-  console.log({orderBy});
-  console.log(b[orderBy]);
-  console.log(a[orderBy]);
-  if (b[orderBy] < a[orderBy]) {
+  // console.log({ orderBy });
+  // console.log(b.word[orderBy]);
+  // console.log(a.word[orderBy]);
+  if (b.word[orderBy] < a.word[orderBy]) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (b.word[orderBy] > a.word[orderBy]) {
     return 1;
   }
   return 0;
@@ -124,39 +124,70 @@ EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
 const styles = theme => ({
   root: {
     width: '100%',
+    // marginTop: theme.spacing.unit * 2,
+    display: 'flex'
+  },
+  divInner: {
+    width: '100%'
+    // marginTop: theme.spacing.unit * 3
+  },
+  paper: {
+    width: '100%'
+    // marginTop: theme.spacing.unit * 3
+  },
+  paperInner: {
+    width: '100%',
     marginTop: theme.spacing.unit * 3
   },
+  margins: {
+    marginLeft: theme.spacing.unit * 3
+  },
   table: {
-    minWidth: 1020
+    minWidth: '100%'
   },
   tableWrapper: {
-    overflowX: 'auto'
+    overflowX: 'auto',
+    marginTop: theme.spacing.unit * 3
   }
 });
+
+const rows = [
+  { id: 'origin', numeric: false, disablePadding: false, label: 'Origin' },
+  { id: 'translate', numeric: false, disablePadding: false, label: 'Translate' }
+];
 
 class ListaPalavrasPage extends React.Component {
   state = {
     order: 'asc',
-    orderBy: 'calories',
-    selected: [],
-    data: [
-      createData('Cupcake', 305, 3.7, 67, 4.3),
-      createData('Donut', 452, 25.0, 51, 4.9),
-      createData('Eclair', 262, 16.0, 24, 6.0),
-      createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-      createData('Gingerbread', 356, 16.0, 49, 3.9),
-      createData('Honeycomb', 408, 3.2, 87, 6.5),
-      createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-      createData('Jelly Bean', 375, 0.0, 94, 0.0),
-      createData('KitKat', 518, 26.0, 65, 7.0),
-      createData('Lollipop', 392, 0.2, 98, 0.0),
-      createData('Marshmallow', 318, 0, 81, 2.0),
-      createData('Nougat', 360, 19.0, 9, 37.0),
-      createData('Oreo', 437, 18.0, 63, 4.0)
-    ],
+    orderBy: 'origin',
+    selected: null,
     page: 0,
-    rowsPerPage: 5
+    rowsPerPage: 10
   };
+
+  componentWillMount() {
+    const { onFetchAllWordsForUserRequest, user } = this.props;
+    onFetchAllWordsForUserRequest({ user });
+  }
+
+  // shouldComponentUpdate(nextProps) {
+  //   const { listWordsForUser } = nextProps;
+  //   const { selected } = this.state;
+
+  //   if (listWordsForUser && selected) {
+  //     const word = listWordsForUser.find(l => {
+  //       return (
+  //         l.word.id === selected.word.id &&
+  //         l.addFlashCards !== selected.addFlashCards
+  //       );
+  //     });
+  //     if (word) {
+  //       this.setState({ selected: null });
+  //     }
+  //   }
+
+  //   return true;
+  // }
 
   handleRequestSort = (event, property) => {
     const orderBy = property;
@@ -179,24 +210,9 @@ class ListaPalavrasPage extends React.Component {
   };
 
   handleClick = (event, id) => {
-    const { selected } = this.state;
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    this.setState({ selected: newSelected });
+    const { listWordsForUser } = this.props;
+    const word = listWordsForUser.find(l => l.id === id);
+    this.setState({ selected: word });
   };
 
   handleChangePage = (event, page) => {
@@ -207,88 +223,203 @@ class ListaPalavrasPage extends React.Component {
     this.setState({ rowsPerPage: event.target.value });
   };
 
-  // eslint-disable-next-line semi
+  handleForgetWord = () => {
+    const { onForgetWord, user } = this.props;
+    const { selected } = this.state;
+    onForgetWord({ word: selected, user });
+    this.setState({ selected: null });
+  };
+  
+  handleAddFlashCard = () => {
+    const { onAddFlashCard, user } = this.props;
+    const { selected } = this.state;
+    onAddFlashCard({ word: selected, user });
+    this.setState({ selected: null });
+  };
+  
+  handleRemoveFlashCard = () => {
+    const { onRemoveFlashCard, user } = this.props;
+    const { selected } = this.state;
+    onRemoveFlashCard({ word: selected, user });
+    this.setState({ selected: null });
+  };
+
   isSelected = id => {
-    this.state.selected.indexOf(id) !== -1;
+    const { selected } = this.state;
+    return selected && selected.id === id;
   };
 
   render() {
-    const { classes } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
+    const { classes, listWordsForUser } = this.props;
+    const { order, orderBy, rowsPerPage, page, selected } = this.state;
+    if (!listWordsForUser) {
+      return null;
+    }
+    if (listWordsForUser.length === 0) {
+      return (
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography component="p">Begin to read !!!</Typography>
+          </CardContent>
+        </Card>
+      );
+    }
     const emptyRows =
-      rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
+      rowsPerPage -
+      Math.min(rowsPerPage, listWordsForUser.length - page * rowsPerPage);
 
     return (
-      <Paper className={classes.root}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table} aria-labelledby="tableTitle">
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={this.handleSelectAllClick}
-              onRequestSort={this.handleRequestSort}
-              rowCount={data.length}
-            />
-            <TableBody>
-              {stableSort(data, getSorting(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(n => {
-                  const isSelected = this.isSelected(n.id);
-                  return (
-                    <TableRow
-                      hover
-                      onClick={event => this.handleClick(event, n.id)}
-                      role="checkbox"
-                      aria-checked={isSelected}
-                      tabIndex={-1}
-                      key={n.id}
-                      selected={isSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={isSelected} />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {n.name}
-                      </TableCell>
-                      <TableCell align="right">{n.calories}</TableCell>
-                      <TableCell align="right">{n.fat}</TableCell>
-                      <TableCell align="right">{n.carbs}</TableCell>
-                      <TableCell align="right">{n.protein}</TableCell>
+      <div className={classes.root}>
+        <div className={classes.divInner}>
+          <Paper
+            className={classes.paper}
+            style={{ display: 'flex', justifyContent: 'center' }}
+          >
+            <Typography variant="h4"> List of word you know</Typography>
+          </Paper>
+          <Paper className={classes.paper}>
+            <div className={classes.tableWrapper}>
+              <Table className={classes.table} aria-labelledby="tableTitle">
+                <EnhancedTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  onRequestSort={this.handleRequestSort}
+                  rows={rows}
+                />
+                <TableBody>
+                  {stableSort(listWordsForUser, getSorting(order, orderBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map(n => {
+                      const isSelected = this.isSelected(n.id);
+                      return (
+                        <TableRow
+                          hover
+                          onClick={event => this.handleClick(event, n.id)}
+                          tabIndex={-1}
+                          key={n.id}
+                          selected={isSelected}
+                        >
+                          <TableCell align="left">{n.word.origin}</TableCell>
+                          <TableCell align="left">{n.word.translate}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {emptyRows > 0 && (
+                    <TableRow style={{ height: 49 * emptyRows }}>
+                      <TableCell colSpan={6} />
                     </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 49 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </Paper>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={listWordsForUser.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            backIconButtonProps={{
+              'aria-label': 'Previous Page'
+            }}
+            nextIconButtonProps={{
+              'aria-label': 'Next Page'
+            }}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+          />
         </div>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          backIconButtonProps={{
-            'aria-label': 'Previous Page'
-          }}
-          nextIconButtonProps={{
-            'aria-label': 'Next Page'
-          }}
-          onChangePage={this.handleChangePage}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
-        />
-      </Paper>
+        <div className={classes.divInner}>
+          {selected ? (
+            <div className={classes.margins}>
+              <Paper
+                className={classes.paper}
+                style={{ display: 'flex', justifyContent: 'center' }}
+              >
+                <Typography variant="h4"> Word</Typography>
+              </Paper>
+              <Card className={classes.paperInner}>
+                <CardContent>
+                  Origin:
+                  <Typography variant="h5" style={{ padding: 5 }}>
+                    {' '}
+                    {selected.word.origin}
+                  </Typography>
+                  Translate:
+                  <Typography variant="h5" style={{ padding: 5 }}>
+                    {' '}
+                    {selected.word.translate}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="secondary"
+                    onClick={this.handleForgetWord}
+                  >
+                    Forget
+                  </Button>
+                  {selected.addFlashCards ? (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={this.handleRemoveFlashCard}
+                    >
+                      Remove Flash Card
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color="primary"
+                      onClick={this.handleAddFlashCard}
+                    >
+                      Add Flash Card
+                    </Button>
+                  )}
+                </CardActions>
+              </Card>
+            </div>
+          ) : null}
+        </div>
+      </div>
     );
   }
 }
 
 ListaPalavrasPage.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  listWordsForUser: PropTypes.array,
+  user: PropTypes.object,
+  onFetchAllWordsForUserRequest: PropTypes.func.isRequired,
+  onForgetWord: PropTypes.func.isRequired,
+  onAddFlashCard: PropTypes.func.isRequired,
+  onRemoveFlashCard: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(ListaPalavrasPage);
+const mapStateToProps = createStructuredSelector({
+  loading: selectors.selectorLoading(),
+  error: selectors.selectorError(),
+  user: selectorsSession.selectorSessionUser(),
+  listWordsForUser: selectors.selectorListWordsForUser()
+});
+
+const mapDispatchToProps = dispatch => ({
+  onFetchAllWordsForUserRequest: payload =>
+    dispatch(TextoActions.fetchAllWordsForUserRequest(payload)),
+  reset: () => dispatch(TextoActions.resetRedux()),
+  onForgetWord: payload => dispatch(TextoActions.forgetWordRequest(payload)),
+  onAddFlashCard: payload =>
+    dispatch(TextoActions.addFlashCardRequest(payload)),
+  onRemoveFlashCard: payload =>
+    dispatch(TextoActions.removeFlashCardRequest(payload))
+});
+
+const connectListaPalavrasPage = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ListaPalavrasPage);
+
+export default withStyles(styles)(connectListaPalavrasPage);

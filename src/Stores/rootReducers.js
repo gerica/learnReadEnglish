@@ -2,8 +2,8 @@
 import { combineReducers } from 'redux';
 import { reducer as reduxFormReducer } from 'redux-form';
 import sessionReducer from './Session/reducer';
-import bolsaAcoesReducer from './BolsaAcoes/reducer';
 import textoReducer from './Texto/reducer';
+import flashCardReducer from './FlashCard/reducer';
 
 /**
  * Creates the main reducer with the asynchronously loaded ones
@@ -11,8 +11,8 @@ import textoReducer from './Texto/reducer';
 export default function createReducer() {
   return combineReducers({
     form: reduxFormReducer,
-    bolsaAcoes: bolsaAcoesReducer,
     session: sessionReducer,
-    texto: textoReducer
+    texto: textoReducer,
+    flashCard: flashCardReducer
   });
 }

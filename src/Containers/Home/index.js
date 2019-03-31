@@ -18,6 +18,8 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
+import { blue } from '@material-ui/core/colors';
+
 import TextInputBase from '../../Components/Form/TextInputBase';
 
 import * as selectors from '../../Stores/Texto/selector';
@@ -64,16 +66,20 @@ const styles = theme => ({
     marginRight: theme.spacing.unit,
     width: '95%'
   },
-  avatar: {
-    // backgroundColor: red[500]
+  buttonProgress: {
+    color: blue[500],
+    position: 'absolute',
+    top: '41.3%',
+    left: '9.5%',
+    marginTop: -12,
+    marginLeft: -12
   }
 });
 
 class HomePage extends Component {
   componentWillMount() {
-    // const { fetchCotacaoRequest, reset } = this.props;
-    // fetchCotacaoRequest('ABEV3.SA');
-    // reset();
+    // const { onReset } = this.props;
+    // onReset();
     // const { initialize } = this.props;
     // // moment.to;
     // initialize({
@@ -119,8 +125,6 @@ class HomePage extends Component {
                 label="Texto"
                 className={classes.textField}
                 required
-                multiline
-                rowsMax="10"
                 adornmentIcon="textsms"
                 component={TextInputBase}
               />
@@ -222,6 +226,7 @@ class HomePage extends Component {
 
 HomePage.propTypes = {
   onCompileTextWords: PropTypes.func,
+  onReset: PropTypes.func,
   loading: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   handleSubmit: PropTypes.func.isRequired,
   // listaCotacaoDia: PropTypes.checkPropTypes(PropTypes.array),
@@ -253,7 +258,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(TextoActions.compileTextWordsRequest(papel)),
   onDoneTextWordsRequest: payload =>
     dispatch(TextoActions.doneTextWordsRequest(payload)),
-  reset: () => dispatch(TextoActions.resetRedux())
+  onReset: () => dispatch(TextoActions.resetRedux())
 });
 
 const validate = createValidator({

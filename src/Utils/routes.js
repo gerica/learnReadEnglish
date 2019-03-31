@@ -1,9 +1,15 @@
 /* eslint-disable linebreak-style */
-import { Home, AccountCircle } from '@material-ui/icons';
+import { Home, AccountCircle, ChromeReaderMode } from '@material-ui/icons';
 import HomePage from '../Containers/Home';
 import LoginPage from '../Containers/Login';
 import PerfilPage from '../Containers/Perfil';
-import { ROUTER_HOME, ROUTER_LOGIN, ROUTER_PERFIL } from './constants';
+import FlashCardPage from '../Containers/FlashCard';
+import {
+  ROUTER_HOME,
+  ROUTER_LOGIN,
+  ROUTER_PERFIL,
+  ROUTER_FLASH_CARD
+} from './constants';
 
 const Routes = [
   {
@@ -22,6 +28,15 @@ const Routes = [
     navbarName: 'Perfil',
     icon: AccountCircle,
     component: PerfilPage,
+    selected: false
+  },
+  {
+    order: 3,
+    path: ROUTER_FLASH_CARD,
+    sidebarName: 'FlashCards',
+    navbarName: 'FlashCards',
+    icon: ChromeReaderMode,
+    component: FlashCardPage,
     selected: false
   },
   {

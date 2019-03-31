@@ -6,7 +6,6 @@ import { MuiThemeProvider } from '@material-ui/core/styles';
 
 import MiniDrawer from './Components/Drawer/MiniDrawer';
 import PerfilPage from './Containers/Perfil';
-import CarteiraPage from './Containers/Carteira';
 import HomePage from './Containers/Home';
 import configureStore from './Stores';
 import MyTheme from './muiTheme';
@@ -17,8 +16,9 @@ import {
   ROUTER_HOME,
   ROUTER_DEFAULT,
   ROUTER_LOGIN_PARAMS,
-  ROUTER_CARTEIRA
+  ROUTER_FLASH_CARD
 } from './Utils/constants';
+import FlashCard from './Containers/FlashCard';
 
 const { store, persistor } = configureStore();
 function App() {
@@ -30,7 +30,7 @@ function App() {
             <MiniDrawer>
               {/* <Header /> */}
               <Switch>
-                <Route path={ROUTER_CARTEIRA} component={CarteiraPage} />
+                <Route path={ROUTER_FLASH_CARD} component={FlashCard} />
                 <Route path={ROUTER_PERFIL} component={PerfilPage} />
                 <Route exact path={ROUTER_LOGIN} component={LoginPage} />
                 <Route path={ROUTER_LOGIN_PARAMS} component={LoginPage} />
