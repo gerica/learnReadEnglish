@@ -86,7 +86,9 @@ class TextInputBase extends Component {
       label,
       className,
       input: { value, ...inputProps },
-      meta: { touched, error }
+      meta: { touched, error },
+      multiline,
+      rows
     } = this.props;
 
     const idComponent = `component-${label}`;
@@ -106,6 +108,8 @@ class TextInputBase extends Component {
           aria-describedby="component-error-text"
           {...inputProps}
           endAdornment={this.renderAdornment()}
+          multiline={multiline}
+          rows={rows}
         />
         {touched && (
           <FormHelperText id="component-error-text">{error}</FormHelperText>
@@ -122,7 +126,9 @@ TextInputBase.propTypes = {
   typeField: PropTypes.string,
   adornment: PropTypes.bool,
   adornmentIcon: PropTypes.string,
-  handleClickShowPassword: PropTypes.func
+  handleClickShowPassword: PropTypes.func,
+  multiline: PropTypes.bool,
+  rows: PropTypes.string
 };
 
 TextInputBase.defaultProps = {

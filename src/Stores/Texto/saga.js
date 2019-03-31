@@ -88,11 +88,18 @@ function* translateWords({ payload }) {
       const element = words[index];
       // const elementClean = yield* cleanElement(element);
       const elementClean = toCleanWord(element);
+      if (elementClean.length === 0) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
       if (palavrasConchecidas && palavrasConchecidas.length > 0) {
         const jaSabe = palavrasConchecidas.find(
           e => e.word.origin === elementClean
         );
         if (jaSabe) {
+          if (jaSabe.addFlashCards) {
+            result.push(jaSabe.word);
+          }
           // eslint-disable-next-line no-continue
           continue;
         }
@@ -193,7 +200,7 @@ function* doneTextWordsRequest({ payload }) {
     const obj = {
       word: { ...word },
       user: user.uid,
-      addFlashCards: false
+      addFlashCards: word.addFlashCards || false
     };
 
     yield call([FbTextoUsuarioService, FbTextoUsuarioService.save], obj);

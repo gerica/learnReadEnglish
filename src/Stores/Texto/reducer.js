@@ -37,7 +37,7 @@ export const resetRedux = (state = INITIAL_STATE) => ({
   error: null,
   message: null,
   done: false,
-  listWords: null,
+  listWords: null
   // listWordsForUser: null
 });
 
@@ -59,6 +59,9 @@ export const doneTextWordsSuccess = (state = INITIAL_STATE, { word }) => {
   const { listWords } = state;
 
   const result = [];
+  if (word.addFlashCards) {
+    result.push(word);
+  }
   listWords.forEach(e => {
     if (e.origin !== word.origin) {
       result.push(e);

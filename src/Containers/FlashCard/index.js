@@ -89,20 +89,21 @@ class FlashCardPage extends React.Component {
   };
 
   renderFlashCard() {
-    const { classes, selectedCard, showAnswer } = this.props;
+    const { classes, selectedCard, showAnswer, listFlasCard } = this.props;
 
-    if (!selectedCard) {
+    if (!selectedCard || !listFlasCard) {
       return (
         <Paper className={classes.paperTitle}>
           <Typography variant="h4"> No have flash cards</Typography>
         </Paper>
       );
     }
+    const titleDesc = `Flash Card Learn: cadas(${listFlasCard.length})`;
 
     return (
       <div className={classes.divCenter}>
         <Card className={classes.card}>
-          <CardHeader title="Flash Card Learn" />
+          <CardHeader title={titleDesc} />
           <CardContent>
             <CardContent>
               <Typography variant="h4">
@@ -183,8 +184,8 @@ FlashCardPage.propTypes = {
   onAnswerFlashCardRequest: PropTypes.func.isRequired,
   onToggleShowAnswer: PropTypes.func.isRequired,
   showAnswer: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired
-  // listFlasCard: PropTypes.array
+  loading: PropTypes.bool.isRequired,
+  listFlasCard: PropTypes.array
 };
 
 FlashCardPage.defaultProps = {
@@ -196,8 +197,8 @@ const mapStateToProps = createStructuredSelector({
   error: selectors.selectorError(),
   user: selectorsSession.selectorSessionUser(),
   selectedCard: selectors.selectorSelectedCard(),
-  showAnswer: selectors.selectorShowAnswer()
-  // listFlasCard: selectors.selectorListFlasCard()
+  showAnswer: selectors.selectorShowAnswer(),
+  listFlasCard: selectors.selectorListFlasCard()
 });
 
 const mapDispatchToProps = dispatch => ({

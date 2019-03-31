@@ -6,7 +6,6 @@ import {
   CardContent,
   CardActions,
   Button,
-  CircularProgress,
   Icon,
   IconButton,
   Tooltip,
@@ -18,7 +17,7 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
-import { blue } from '@material-ui/core/colors';
+import { blue, green } from '@material-ui/core/colors';
 
 import TextInputBase from '../../Components/Form/TextInputBase';
 
@@ -69,7 +68,7 @@ const styles = theme => ({
   buttonProgress: {
     color: blue[500],
     position: 'absolute',
-    top: '41.3%',
+    top: '44.8%',
     left: '9.5%',
     marginTop: -12,
     marginLeft: -12
@@ -100,6 +99,13 @@ class HomePage extends Component {
     return '';
   }
 
+  getStyle(word) {
+    if (word.addFlashCards) {
+      return { backgroundColor: green[100] };
+    }
+    return {};
+  }
+
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }));
   };
@@ -107,6 +113,11 @@ class HomePage extends Component {
   handleDoneText = word => {
     const { onDoneTextWordsRequest, user } = this.props;
     onDoneTextWordsRequest({ word, user });
+  };
+
+  handleAddFlashCard = word => {
+    const { onDoneTextWordsRequest, user } = this.props;
+    onDoneTextWordsRequest({ word: { ...word, addFlashCards: true }, user });
   };
 
   renderCards() {
@@ -127,6 +138,8 @@ class HomePage extends Component {
                 required
                 adornmentIcon="textsms"
                 component={TextInputBase}
+                multiline
+                rows="4"
               />
             </CardContent>
             <CardActions>
@@ -139,12 +152,12 @@ class HomePage extends Component {
               >
                 Compilar
               </Button>
-              {loading && (
+              {/* {loading && (
                 <CircularProgress
                   size={24}
                   className={classes.buttonProgress}
                 />
-              )}
+              )} */}
             </CardActions>
           </Card>
           <Card className={classes.card} style={{ width: '50%' }}>
@@ -175,7 +188,7 @@ class HomePage extends Component {
     }
 
     const cards = listWords.map((w, index) => (
-      <Card className={classes.card} key={index}>
+      <Card className={classes.card} key={index} style={this.getStyle(w)}>
         {/* <CardHeader title='teste' /> */}
 
         <CardContent>
@@ -190,6 +203,16 @@ class HomePage extends Component {
               onClick={() => this.handleDoneText(w)}
             >
               <Icon>done</Icon>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="FlashCard">
+            <IconButton
+              color="primary"
+              className={classes.button}
+              aria-label="Add an alarm"
+              onClick={() => this.handleAddFlashCard(w)}
+            >
+              <Icon>edit</Icon>
             </IconButton>
           </Tooltip>
           {/* <IconButton color="secondary" className={classes.button} aria-label="Add an alarm">
