@@ -1,7 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-unused-expressions */
 import React from 'react';
-// import classNames from 'classnames';
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -16,7 +16,9 @@ import {
   CardActions,
   Button,
   Icon,
-  CardHeader
+  CardHeader,
+  Grow,
+  Fade
 } from '@material-ui/core';
 import { green, yellow, red } from '@material-ui/core/colors';
 
@@ -88,6 +90,22 @@ class FlashCardPage extends React.Component {
     onAnswerFlashCardRequest({ answer, card: selectedCard });
   };
 
+  renderGrow(comp, show) {
+    return (
+      <Grow
+        in={show}
+        style={{ transformOrigin: '0 0 0' }}
+        {...(show ? { timeout: 1000 } : {})}
+      >
+        {comp}
+      </Grow>
+    );
+  }
+
+  renderFade(comp, show) {
+    return <Fade in={show}>{comp}</Fade>;
+  }
+
   renderFlashCard() {
     const { classes, selectedCard, showAnswer, listFlasCard } = this.props;
 
@@ -100,9 +118,52 @@ class FlashCardPage extends React.Component {
     }
     const titleDesc = `Flash Card Learn: cadas(${listFlasCard.length})`;
 
+    const polygon = (
+      <Paper elevation={4} className={classes.paper}>
+        <svg className={classes.svg}>
+          <polygon points="0,100 50,00, 100,100" className={classes.polygon} />
+        </svg>
+      </Paper>
+    );
+
+    const answer = (
+      <Paper className={classes.paperAnswer}>
+        <Typography variant="h3">{selectedCard.word.translate}</Typography>
+      </Paper>
+    );
+
+    const actions = (
+      <CardActions className={classes.actions} disableActionSpacing>
+        <Button
+          variant="contained"
+          size="small"
+          style={{ backgroundColor: green[300] }}
+          onClick={() => this.handleAnswerFlashCard(ANSWER_EASY)}
+        >
+          Easy
+        </Button>
+        <Button
+          variant="contained"
+          size="small"
+          style={{ backgroundColor: yellow[300] }}
+          onClick={() => this.handleAnswerFlashCard(ANSWER_MEDIDUM)}
+        >
+          Medium
+        </Button>
+        <Button
+          variant="contained"
+          size="small"
+          style={{ backgroundColor: red[300] }}
+          onClick={() => this.handleAnswerFlashCard(ANSWER_DIFFICULT)}
+        >
+          Difficult
+        </Button>
+      </CardActions>
+    );
+
     return (
       <div className={classes.divCenter}>
-        <Card className={classes.card}>
+        <Card className={classNames(classes.card, classes.bounce)}>
           <CardHeader title={titleDesc} />
           <CardContent>
             <CardContent>
@@ -110,11 +171,7 @@ class FlashCardPage extends React.Component {
                 Word: {selectedCard.word.origin}
               </Typography>
               {showAnswer ? (
-                <Paper className={classes.paperAnswer}>
-                  <Typography variant="h3">
-                    {selectedCard.word.translate}
-                  </Typography>
-                </Paper>
+                this.renderGrow(answer, showAnswer)
               ) : (
                 <div className={classes.divCenter}>
                   <IconButton
@@ -128,34 +185,7 @@ class FlashCardPage extends React.Component {
                 </div>
               )}
             </CardContent>
-            {showAnswer ? (
-              <CardActions className={classes.actions} disableActionSpacing>
-                <Button
-                  variant="contained"
-                  size="small"
-                  style={{ backgroundColor: green[300] }}
-                  onClick={() => this.handleAnswerFlashCard(ANSWER_EASY)}
-                >
-                  Easy
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  style={{ backgroundColor: yellow[300] }}
-                  onClick={() => this.handleAnswerFlashCard(ANSWER_MEDIDUM)}
-                >
-                  Medium
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  style={{ backgroundColor: red[300] }}
-                  onClick={() => this.handleAnswerFlashCard(ANSWER_DIFFICULT)}
-                >
-                  Difficult
-                </Button>
-              </CardActions>
-            ) : null}
+            {showAnswer ? this.renderFade(actions, showAnswer) : null}
           </CardContent>
         </Card>
       </div>
