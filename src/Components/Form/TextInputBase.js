@@ -111,7 +111,7 @@ class TextInputBase extends Component {
           multiline={multiline}
           rows={rows}
         />
-        {touched && (
+        {touched && error && (
           <FormHelperText id="component-error-text">{error}</FormHelperText>
         )}
       </FormControl>

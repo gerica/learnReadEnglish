@@ -9,15 +9,17 @@ import {
   Icon,
   IconButton,
   Tooltip,
-  Typography
+  Typography,
+  Collapse
 } from '@material-ui/core';
 import { Field, reduxForm } from 'redux-form';
-// import classnames from 'classnames';
+import classnames from 'classnames';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
 import { blue, green } from '@material-ui/core/colors';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import TextInputBase from '../../Components/Form/TextInputBase';
 
@@ -76,6 +78,8 @@ const styles = theme => ({
 });
 
 class HomePage extends Component {
+  state = { expanded: false };
+
   componentWillMount() {
     // const { onReset } = this.props;
     // onReset();
@@ -110,6 +114,10 @@ class HomePage extends Component {
     this.setState(state => ({ expanded: !state.expanded }));
   };
 
+  handleExpandClick = () => {
+    this.setState(state => ({ expanded: !state.expanded }));
+  };
+
   handleDoneText = word => {
     const { onDoneTextWordsRequest, user } = this.props;
     onDoneTextWordsRequest({ word, user });
@@ -122,48 +130,62 @@ class HomePage extends Component {
 
   renderCards() {
     const { classes, handleSubmit, loading, text } = this.props;
+    const { expanded } = this.state;
     const routerHome = Routes.find(r => r.order === 1);
 
     return (
       <div className={classes.root}>
         <TitlePage routerMain={routerHome} />
-        <div style={{ display: 'flex' }}>
-          <Card className={classes.card} style={{ width: '50%' }}>
-            <CardHeader title="Text for compiler" />
-            <CardContent>
-              <Field
-                name="texto"
-                label="Texto"
-                className={classes.textField}
-                required
-                adornmentIcon="textsms"
-                component={TextInputBase}
-                multiline
-                rows="4"
-              />
-            </CardContent>
-            <CardActions>
-              <Button
-                variant="contained"
-                size="small"
-                color="primary"
-                onClick={handleSubmit(this.onSubmit)}
-                disabled={loading}
-              >
-                Compilar
-              </Button>
-              {/* {loading && (
-                <CircularProgress
-                  size={24}
-                  className={classes.buttonProgress}
+        <div>
+          <Card className={classes.card}>
+            <CardHeader
+              title="Text for compiler"
+              action={
+                <IconButton
+                  className={classnames(classes.expand, {
+                    [classes.expandOpen]: expanded
+                  })}
+                  onClick={this.handleExpandClick}
+                  aria-expanded={expanded}
+                  aria-label="Show more"
+                >
+                  <ExpandMoreIcon />
+                </IconButton>
+              }
+            />
+            <Collapse in={!expanded} timeout="auto" unmountOnExit>
+              <CardContent>
+                <Field
+                  name="texto"
+                  label="Texto"
+                  className={classes.textField}
+                  required
+                  adornmentIcon="textsms"
+                  component={TextInputBase}
+                  multiline
+                  rows="4"
                 />
-              )} */}
-            </CardActions>
+              </CardContent>
+              <CardActions>
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="primary"
+                  onClick={handleSubmit(this.onSubmit)}
+                  disabled={loading}
+                >
+                  Compilar
+                </Button>
+              </CardActions>
+            </Collapse>
           </Card>
-          <Card className={classes.card} style={{ width: '50%' }}>
+        </div>
+        <div style={{ display: 'flex' }}>
+          <Card className={classes.card} style={{ width: '100%' }}>
             <CardHeader title="Text" />
             <CardContent>{text}</CardContent>
           </Card>
+          {this.renderWordsCard()}
         </div>
       </div>
     );
@@ -241,7 +263,6 @@ class HomePage extends Component {
         ) : null}
         {loading ? <CustomizedProgress /> : null}
         <ViewCards>{this.renderCards()}</ViewCards>
-        <ViewCards>{this.renderWordsCard()}</ViewCards>
       </Fragment>
     );
   }
