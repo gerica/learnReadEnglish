@@ -38,7 +38,8 @@ export const resetRedux = (state = INITIAL_STATE) => ({
   error: null,
   message: null,
   done: false,
-  listWords: null
+  listWords: null,
+  loading: false
   // listWordsForUser: null
 });
 

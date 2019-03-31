@@ -81,8 +81,8 @@ class HomePage extends Component {
   state = { expanded: false };
 
   componentWillMount() {
-    // const { onReset } = this.props;
-    // onReset();
+    const { onReset } = this.props;
+    onReset();
     // const { initialize } = this.props;
     // // moment.to;
     // initialize({
@@ -235,6 +235,16 @@ class HomePage extends Component {
               onClick={() => this.handleAddFlashCard(w)}
             >
               <Icon>edit</Icon>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Custom ">
+            <IconButton
+              color="primary"
+              className={classes.button}
+              aria-label="Add an alarm"
+              // onClick={() => this.handleAddFlashCard(w)}
+            >
+              <Icon>more_vert</Icon>
             </IconButton>
           </Tooltip>
           {/* <IconButton color="secondary" className={classes.button} aria-label="Add an alarm">
