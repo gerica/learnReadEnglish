@@ -77,7 +77,7 @@ function* translateWords({ payload }) {
     const words = texto.split(' ');
 
     const result = [];
-    const baseTexto = yield call([FbTextoService, FbTextoService.fetchAll]);
+    // const baseTexto = yield call([FbTextoService, FbTextoService.fetchAll]);
     const palavrasConchecidas = yield call(
       [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
       payload
@@ -105,20 +105,16 @@ function* translateWords({ payload }) {
         }
       }
 
-      const textExist = baseTexto.find(t => t.origin === elementClean);
+      // const textExist = baseTexto.find(t => t.origin === elementClean);
 
-      if (!textExist) {
-        let textObj = yield* translateYandex(elementClean);
-        if (!textObj) {
-          textObj = yield* translateGoogle(elementClean);
-        }
+      let textObj = yield* translateYandex(elementClean);
+      if (!textObj) {
+        textObj = yield* translateGoogle(elementClean);
+      }
 
-        if (textObj) {
-          yield* gravarBaseTexto(textObj);
-          result.push(textObj);
-        }
-      } else {
-        result.push(textExist);
+      if (textObj) {
+        yield* gravarBaseTexto(textObj);
+        result.push(textObj);
       }
     }
 
