@@ -104,7 +104,6 @@ function* signInGoogleRequest() {
  */
 function* signInRequest({ payload }) {
   try {
-    // console.log({ payload });
     yield call([FbSessionService, FbSessionService.signIn], payload);
     yield call([FbSessionService, FbSessionService.update], payload);
     const _user = yield call([FbSessionService, FbSessionService.refresh]);

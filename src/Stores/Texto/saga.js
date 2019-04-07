@@ -7,9 +7,40 @@ import { YANDEX_KEY, MSG_001 } from '../../Utils/constants';
 
 const sourceLang = 'auto';
 const targetLang = 'pt';
+const COUNT_TEXT = 1000;
 
-function* gravarBaseTexto(textObj) {
-  yield call([FbTextoService, FbTextoService.save], textObj);
+function* addRemoveFlashCard(payload, addOrRemove) {
+  try {
+    const { word, user } = payload;
+    const list = yield call(
+      [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
+      payload
+    );
+    const wordsKnows = list[0];
+    const changeWord = wordsKnows.words.find(w => w.origin === word.origin);
+    changeWord.addFlashCards = addOrRemove;
+    yield call(
+      [FbTextoUsuarioService, FbTextoUsuarioService.update],
+      wordsKnows
+    );
+    yield put(
+      TextoActions.fetchAllWordsForUserRequest({
+        user,
+        msg: MSG_001
+      })
+    );
+  } catch (err) {
+    console.log({ err });
+    yield put(TextoActions.failure(err));
+  }
+}
+
+function* saveOrUpdateBaseTexto(payload) {
+  if (payload.id) {
+    yield call([FbTextoService, FbTextoService.update], payload);
+  } else {
+    yield call([FbTextoService, FbTextoService.save], payload);
+  }
 }
 
 function toCleanWord(element) {
@@ -77,7 +108,9 @@ function* translateWords({ payload }) {
     const words = texto.split(' ');
 
     const result = [];
-    // const baseTexto = yield call([FbTextoService, FbTextoService.fetchAll]);
+    let resultNews;
+    const baseTexto = yield call([FbTextoService, FbTextoService.fetchAll]);
+
     const palavrasConchecidas = yield call(
       [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
       payload
@@ -92,47 +125,87 @@ function* translateWords({ payload }) {
         // eslint-disable-next-line no-continue
         continue;
       }
+
       if (palavrasConchecidas && palavrasConchecidas.length > 0) {
-        const jaSabe = palavrasConchecidas.find(
-          e => e.word.origin === elementClean
+        const jaSabe = palavrasConchecidas[0].words.find(
+          e => e.origin === elementClean
         );
         if (jaSabe) {
           if (jaSabe.addFlashCards) {
-            result.push(jaSabe.word);
+            result.push(jaSabe);
           }
           // eslint-disable-next-line no-continue
           continue;
         }
       }
 
-      // const textExist = baseTexto.find(t => t.origin === elementClean);
+      let textExist = null;
+      for (let x = 0; x < baseTexto.length; x++) {
+        if (textExist) {
+          break;
+        }
+        const baseTextoElemento = baseTexto[x];
 
-      let textObj = yield* translateYandex(elementClean);
-      if (!textObj) {
-        textObj = yield* translateGoogle(elementClean);
+        if (baseTextoElemento && baseTextoElemento.texts) {
+          textExist = baseTextoElemento.texts.find(
+            t => t.origin === elementClean
+          );
+          if (textExist) {
+            break;
+          }
+        }
       }
 
-      if (textObj) {
-        yield* gravarBaseTexto(textObj);
-        result.push(textObj);
+      if (!textExist) {
+        if (resultNews && resultNews.texts.length >= COUNT_TEXT) {
+          yield* saveOrUpdateBaseTexto(resultNews);
+          resultNews = null;
+        }
+
+        if (!resultNews && baseTexto && baseTexto.length > 0) {
+          resultNews = baseTexto.find(b => b.texts.length < COUNT_TEXT);
+        }
+
+        if (!resultNews) {
+          resultNews = { texts: [] };
+        }
+
+        let textObj = yield* translateYandex(elementClean);
+        if (!textObj) {
+          textObj = yield* translateGoogle(elementClean);
+        }
+
+        if (textObj) {
+          resultNews.texts.push(textObj);
+          result.push(textObj);
+        }
+      } else {
+        result.push(textExist);
       }
+    }
+
+    // console.log({ resultNews });
+    // yield* saveOrUpdateBaseTexto(resultNews);
+    if (resultNews) {
+      yield* saveOrUpdateBaseTexto(resultNews);
     }
 
     yield put(TextoActions.compileTextWordsSuccess(result, texto));
   } catch (err) {
     console.log({ err });
+    // console.trace();
     yield put(TextoActions.failure(err));
   }
 }
 
 function* fetchAllWordsForUserRequest({ payload }) {
   try {
-    const wordsKknows = yield call(
+    const wordsKnows = yield call(
       [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
       payload
     );
     const { msg } = payload;
-    yield put(TextoActions.fetchAllWordsForUserSuccess(wordsKknows, msg));
+    yield put(TextoActions.fetchAllWordsForUserSuccess(wordsKnows, msg));
   } catch (err) {
     console.log({ err });
     yield put(TextoActions.failure(err));
@@ -157,52 +230,48 @@ function* forgetWordRequest({ payload }) {
 }
 
 function* addFlashCardRequest({ payload }) {
-  try {
-    const { word, user } = payload;
-    const newWord = { ...word, addFlashCards: true };
-    yield call([FbTextoUsuarioService, FbTextoUsuarioService.update], newWord);
-    yield put(
-      TextoActions.fetchAllWordsForUserRequest({
-        user,
-        msg: MSG_001
-      })
-    );
-  } catch (err) {
-    console.log({ err });
-    yield put(TextoActions.failure(err));
-  }
+  yield* addRemoveFlashCard(payload, true);
 }
 
 function* removeFlashCardRequest({ payload }) {
-  try {
-    const { word, user } = payload;
-    const newWord = { ...word, addFlashCards: false };
-    yield call([FbTextoUsuarioService, FbTextoUsuarioService.update], newWord);
-    yield put(
-      TextoActions.fetchAllWordsForUserRequest({
-        user,
-        msg: MSG_001
-      })
-    );
-  } catch (err) {
-    console.log({ err });
-    yield put(TextoActions.failure(err));
-  }
+  yield* addRemoveFlashCard(payload, false);
 }
 
 function* doneTextWordsRequest({ payload }) {
   try {
     const { word, user } = payload;
-    const obj = {
-      word: { ...word },
-      user: user.uid,
-      addFlashCards: word.addFlashCards || false
-    };
+    const list = yield call(
+      [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
+      payload
+    );
 
-    yield call([FbTextoUsuarioService, FbTextoUsuarioService.save], obj);
+    const wordsKnows = list[0];
+
+    if (!wordsKnows) {
+      const obj = {
+        words: [
+          {
+            ...word,
+            addFlashCards: word.addFlashCards || false
+          }
+        ],
+        user: user.uid
+      };
+      yield call([FbTextoUsuarioService, FbTextoUsuarioService.save], obj);
+    } else {
+      wordsKnows.words.push({
+        ...word,
+        addFlashCards: word.addFlashCards || false
+      });
+      yield call(
+        [FbTextoUsuarioService, FbTextoUsuarioService.update],
+        wordsKnows
+      );
+    }
 
     yield put(TextoActions.doneTextWordsSuccess(word));
   } catch (err) {
+    console.log({ err });
     yield put(TextoActions.failure(err));
   }
 }

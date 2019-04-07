@@ -208,7 +208,6 @@ class HomePage extends Component {
         </Card>
       );
     }
-
     const cards = listWords.map((w, index) => (
       <Card className={classes.card} key={index} style={this.getStyle(w)}>
         {/* <CardHeader title='teste' /> */}

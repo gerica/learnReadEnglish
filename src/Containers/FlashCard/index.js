@@ -116,7 +116,7 @@ class FlashCardPage extends React.Component {
         </Paper>
       );
     }
-    const titleDesc = `Flash Card Learn: cadas(${listFlasCard.length})`;
+    const titleDesc = `Flash Card Learn: cards(${listFlasCard.length})`;
 
     const polygon = (
       <Paper elevation={4} className={classes.paper}>

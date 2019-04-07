@@ -10,56 +10,60 @@ import FbTextoUsuarioService from '../../Service/FbTextoUsuarioService';
 function* criarFlashCardsPalavrasConhecidas(payload, blackList) {
   try {
     const { user } = payload;
-    let palavrasConchecidas = yield call(
+    const palavrasConchecidas = yield call(
       [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
       payload
     );
+
     const listCard = [];
-    if (palavrasConchecidas && palavrasConchecidas.length > 0) {
-      palavrasConchecidas = palavrasConchecidas.filter(p => {
-        const existe = blackList.find(b => b.word.id === p.id);
-        if (existe) {
-          return false;
-        }
-        return true;
-      });
+    if (palavrasConchecidas.length === 0) {
+      return listCard;
+    }
 
-      const palavrasPodeSerAdicionada = palavrasConchecidas.filter(
-        p => p.addFlashCards
+    let wordsKnows = palavrasConchecidas[0].words;
+
+    wordsKnows = wordsKnows.filter(p => {
+      const existe = blackList.find(b => b.word.id === p.id);
+      if (existe) {
+        return false;
+      }
+      return true;
+    });
+
+    const palavrasPodeSerAdicionada = wordsKnows.filter(p => p.addFlashCards);
+
+    if (
+      palavrasPodeSerAdicionada.length > 0 &&
+      palavrasPodeSerAdicionada.length <= 10
+    ) {
+      palavrasPodeSerAdicionada.forEach(p =>
+        listCard.push({
+          word: { ...p },
+          user: user.uid,
+          nextCheck: new Date(),
+          times: 0,
+          lastsNote: []
+        })
       );
-
-      if (
-        palavrasPodeSerAdicionada.length > 0 &&
-        palavrasPodeSerAdicionada.length <= 10
-      ) {
-        palavrasPodeSerAdicionada.forEach(p =>
+    } else if (palavrasPodeSerAdicionada.length > 10) {
+      while (listCard.length < 10) {
+        const item =
+          palavrasPodeSerAdicionada[
+            Math.floor(Math.random() * palavrasPodeSerAdicionada.length)
+          ];
+        const jaExisi = listCard.find(e => e.word.id === item.word.id);
+        if (!jaExisi) {
           listCard.push({
-            word: { ...p.word, id: p.id },
+            word: { ...item.word, id: item.id },
             user: user.uid,
             nextCheck: new Date(),
             times: 0,
             lastsNote: []
-          })
-        );
-      } else if (palavrasPodeSerAdicionada.length > 10) {
-        while (listCard.length < 10) {
-          const item =
-            palavrasPodeSerAdicionada[
-              Math.floor(Math.random() * palavrasPodeSerAdicionada.length)
-            ];
-          const jaExisi = listCard.find(e => e.word.id === item.word.id);
-          if (!jaExisi) {
-            listCard.push({
-              word: { ...item.word, id: item.id },
-              user: user.uid,
-              nextCheck: new Date(),
-              times: 0,
-              lastsNote: []
-            });
-          }
+          });
         }
       }
     }
+
     return listCard;
   } catch (err) {
     console.log(err);
@@ -72,27 +76,42 @@ function* criarFlashCardsBaseTexto(payload, blackList) {
     const { user } = payload;
     let baseTexto = yield call([FbTextoService, FbTextoService.fetchAll]);
     const listCard = [];
-    baseTexto = baseTexto.filter(p => {
-      const existe = blackList.find(b => b.word.id === p.id);
-      if (existe) {
-        return false;
+    baseTexto.forEach(base => {
+      // baseTexto = baseTexto.filter(p => {
+      //   const existe = blackList.find(b => b.word.id === p.id);
+      //   if (existe) {
+      //     return false;
+      //   }
+      //   return true;
+      // });
+      if (base.texts.length <= 10) {
+        base.texts.forEach(b =>
+          listCard.push({
+            word: { ...b },
+            user: user.uid,
+            nextCheck: new Date(),
+            times: 0,
+            lastsNote: []
+          })
+        );
+      } else {
+        while (listCard.length < 10) {
+          const item =
+            base.texts[Math.floor(Math.random() * base.texts.length)];
+          const jaExisi = listCard.find(e => e.word.id === item.id);
+          if (!jaExisi) {
+            listCard.push({
+              word: { ...item },
+              user: user.uid,
+              nextCheck: new Date(),
+              times: 0,
+              lastsNote: []
+            });
+          }
+        }
       }
-      return true;
     });
 
-    while (listCard.length < 10) {
-      const item = baseTexto[Math.floor(Math.random() * baseTexto.length)];
-      const jaExisi = listCard.find(e => e.word.id === item.id);
-      if (!jaExisi) {
-        listCard.push({
-          word: { ...item },
-          user: user.uid,
-          nextCheck: new Date(),
-          times: 0,
-          lastsNote: []
-        });
-      }
-    }
     return listCard;
   } catch (err) {
     console.log(err);

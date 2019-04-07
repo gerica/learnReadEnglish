@@ -96,15 +96,18 @@ export const fetchAllWordsForUserSuccess = (
 export const filterListWords = (state = INITIAL_STATE, { filter }) => {
   const { listWordsForUserOrigin } = state;
   let result;
+  const wordsForUser = listWordsForUserOrigin[0];
 
   if (filter && filter.param && filter.param.length > 0) {
-    result = listWordsForUserOrigin.filter(l => {
+    const list = wordsForUser.words.filter(l => {
       return (
-        l.word.origin.includes(filter.param) ||
-        l.word.translate.includes(filter.param) ||
+        l.origin.includes(filter.param) ||
+        l.translate.includes(filter.param) ||
         (l.addFlashCards && filter.param === 'true')
       );
     });
+    wordsForUser.words = list;
+    result = [wordsForUser];
   } else {
     result = listWordsForUserOrigin;
   }

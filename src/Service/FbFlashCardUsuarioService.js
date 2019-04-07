@@ -2,7 +2,7 @@ import firebase from '../Utils/FirebaseUtils';
 
 class FbFlashCardUsuarioService {
   constructor() {
-    this.ref = firebase.firestore().collection('flasCardUsuario');
+    this.ref = firebase.firestore().collection('flashCardUsuario');
   }
 
   async save(payload) {

@@ -24,7 +24,12 @@ import {
   CardContent,
   CardActions,
   Button,
-  TextField
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@material-ui/core';
 
 import * as selectors from '../../Stores/Texto/selector';
@@ -36,10 +41,10 @@ function desc(a, b, orderBy) {
   // console.log({ orderBy });
   // console.log(b.word[orderBy]);
   // console.log(a.word[orderBy]);
-  if (b.word[orderBy] < a.word[orderBy]) {
+  if (b[orderBy] < a[orderBy]) {
     return -1;
   }
-  if (b.word[orderBy] > a.word[orderBy]) {
+  if (b[orderBy] > a[orderBy]) {
     return 1;
   }
   return 0;
@@ -168,7 +173,8 @@ class ListaPalavrasPage extends React.Component {
     orderBy: 'origin',
     selected: null,
     page: 0,
-    rowsPerPage: 10
+    rowsPerPage: 10,
+    open: false
   };
 
   componentWillMount() {
@@ -183,7 +189,7 @@ class ListaPalavrasPage extends React.Component {
   //   if (listWordsForUser && selected) {
   //     const word = listWordsForUser.find(l => {
   //       return (
-  //         l.word.id === selected.word.id &&
+  //         l.id === selected.id &&
   //         l.addFlashCards !== selected.addFlashCards
   //       );
   //     });
@@ -215,9 +221,9 @@ class ListaPalavrasPage extends React.Component {
     this.setState({ selected: [] });
   };
 
-  handleClick = (event, id) => {
+  handleClick = (event, item) => {
     const { listWordsForUser } = this.props;
-    const word = listWordsForUser.find(l => l.id === id);
+    const word = listWordsForUser[0].words.find(l => l === item);
     this.setState({ selected: word });
   };
 
@@ -250,9 +256,9 @@ class ListaPalavrasPage extends React.Component {
     this.setState({ selected: null });
   };
 
-  isSelected = id => {
+  isSelected = item => {
     const { selected } = this.state;
-    return selected && selected.id === id;
+    return selected && selected.item === item;
   };
 
   handleFiltro = event => {
@@ -260,10 +266,71 @@ class ListaPalavrasPage extends React.Component {
     onFilterListWords({ param: event.target.value });
   };
 
+  handleOpenDialog = () => {
+    this.setState({ open: true });
+  };
+
+  handleCloseDialog = () => {
+    this.setState({ open: false });
+  };
+
+  renderDialogEdit() {
+    const { open, selected } = this.state;
+    if (!selected) {
+      return null;
+    }
+    return (
+      <Dialog
+        open={open}
+        onClose={this.handleClose}
+        aria-labelledby="form-dialog-title"
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle id="form-dialog-title">Edit word</DialogTitle>
+        <DialogContent>
+          <DialogContentText>For more details for the word</DialogContentText>
+          <Typography variant="h4">Word: {selected.origin}</Typography>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Email Address"
+            type="email"
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            size="small"
+            color="secondary"
+            onClick={this.handleCloseDialog}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={this.handleCloseDialog}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
   render() {
     const { classes, listWordsForUser } = this.props;
     const { order, orderBy, rowsPerPage, page, selected } = this.state;
     if (!listWordsForUser) {
+      return null;
+    }
+
+    const wordsKnows = listWordsForUser[0];
+    if (!wordsKnows) {
       return null;
     }
     // if (listWordsForUser.length === 0) {
@@ -275,12 +342,14 @@ class ListaPalavrasPage extends React.Component {
     //     </Card>
     //   );
     // }
+    // console.log(wordsKnows.words);
     const emptyRows =
       rowsPerPage -
-      Math.min(rowsPerPage, listWordsForUser.length - page * rowsPerPage);
+      Math.min(rowsPerPage, wordsKnows.words.length - page * rowsPerPage);
 
     return (
       <div className={classes.root}>
+        {this.renderDialogEdit()}
         <div className={classes.divInner}>
           <Paper
             className={classes.paper}
@@ -307,20 +376,20 @@ class ListaPalavrasPage extends React.Component {
                   rows={rows}
                 />
                 <TableBody>
-                  {stableSort(listWordsForUser, getSorting(order, orderBy))
+                  {stableSort(wordsKnows.words, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map(n => {
-                      const isSelected = this.isSelected(n.id);
+                    .map((n, index) => {
+                      const isSelected = this.isSelected(n);
                       return (
                         <TableRow
                           hover
-                          onClick={event => this.handleClick(event, n.id)}
+                          onClick={event => this.handleClick(event, n)}
                           tabIndex={-1}
-                          key={n.id}
+                          key={index}
                           selected={isSelected}
                         >
-                          <TableCell align="left">{n.word.origin}</TableCell>
-                          <TableCell align="left">{n.word.translate}</TableCell>
+                          <TableCell align="left">{n.origin}</TableCell>
+                          <TableCell align="left">{n.translate}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -363,12 +432,12 @@ class ListaPalavrasPage extends React.Component {
                   Origin:
                   <Typography variant="h5" style={{ padding: 5 }}>
                     {' '}
-                    {selected.word.origin}
+                    {selected.origin}
                   </Typography>
                   Translate:
                   <Typography variant="h5" style={{ padding: 5 }}>
                     {' '}
-                    {selected.word.translate}
+                    {selected.translate}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -379,6 +448,14 @@ class ListaPalavrasPage extends React.Component {
                     onClick={this.handleForgetWord}
                   >
                     Forget
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    onClick={this.handleOpenDialog}
+                  >
+                    Edit
                   </Button>
                   {selected.addFlashCards ? (
                     <Button
@@ -436,8 +513,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(TextoActions.addFlashCardRequest(payload)),
   onRemoveFlashCard: payload =>
     dispatch(TextoActions.removeFlashCardRequest(payload)),
-  onFilterListWords: payload =>
-    dispatch(TextoActions.filterListWords(payload))
+  onFilterListWords: payload => dispatch(TextoActions.filterListWords(payload))
 });
 
 const connectListaPalavrasPage = connect(

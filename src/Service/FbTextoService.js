@@ -1,4 +1,3 @@
-
 import firebase from '../Utils/FirebaseUtils';
 
 class FbTextoService {
@@ -11,12 +10,10 @@ class FbTextoService {
     return result;
   }
 
-  async updateInfo({ payload }) {
+  async update(payload) {
     try {
-      const { doacao, status } = payload;
-
-      const doacaoDoc = await this.ref.doc(doacao.id);
-      await doacaoDoc.update({ status });
+      const doacaoDoc = await this.ref.doc(payload.id);
+      await doacaoDoc.update(payload);
     } catch (err) {
       throw err;
     }
@@ -35,15 +32,14 @@ class FbTextoService {
       const result = [];
 
       await this.ref.get().then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            result.push({ id: doc.id, ...doc.data() });
-          });
+        querySnapshot.forEach(doc => {
+          result.push({ id: doc.id, ...doc.data() });
         });
+      });
       return result;
     } catch (err) {
       throw new Error('Erro ao obter lista de pets.');
     }
   }
-
 }
 export default new FbTextoService();

@@ -52,6 +52,7 @@ export const fetchFlashCardForUserSuccess = (
     // eslint-disable-next-line prefer-destructuring
     selected = listFlasCard[0];
   }
+  console.log(selected);
   return {
     ...state,
     error: null,
