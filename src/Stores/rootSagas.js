@@ -13,6 +13,8 @@ export default function* rootSaga() {
     textoSaga.watchForgetWordRequest(),
     textoSaga.watchAddFlashCardRequest(),
     textoSaga.watchRemoveFlashCardRequest(),
+    textoSaga.watchAddTextDescription(),
+    textoSaga.watchAddTextBaseDescription(),
 
     sessionSaga.watchLoginRequest(),
     sessionSaga.watchSignInGoogleRequest(),

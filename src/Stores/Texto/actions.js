@@ -5,6 +5,7 @@ const { Types, Creators } = createActions({
   resetRedux: [],
   success: ['message'],
   failure: ['error'],
+  resetMessage: [],
 
   // CADASTRAR PET PARA DOAÇÃO
   compileTextWordsRequest: ['payload'],
@@ -20,7 +21,9 @@ const { Types, Creators } = createActions({
   addFlashCardRequest: ['payload'],
   removeFlashCardRequest: ['payload'],
 
-  filterListWords: ['filter']
+  filterListWords: ['filter'],
+  addTextDescriptionRequest: ['payload'],
+  addTextBaseDescriptionRequest: ['payload']
 });
 
 export const TextoTypes = Types;

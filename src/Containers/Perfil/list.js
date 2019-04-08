@@ -24,18 +24,14 @@ import {
   CardContent,
   CardActions,
   Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions
+  TextField
 } from '@material-ui/core';
 
 import * as selectors from '../../Stores/Texto/selector';
 import * as selectorsSession from '../../Stores/Session/selector';
 import TextoActions from '../../Stores/Texto/actions';
 import EnhancedTableHead from '../../Components/Table/EnhancedTableHead';
+import EditTranslate from '../../Components/Dialog/editTranslate';
 
 function desc(a, b, orderBy) {
   // console.log({ orderBy });
@@ -182,25 +178,6 @@ class ListaPalavrasPage extends React.Component {
     onFetchAllWordsForUserRequest({ user });
   }
 
-  // shouldComponentUpdate(nextProps) {
-  //   const { listWordsForUser } = nextProps;
-  //   const { selected } = this.state;
-
-  //   if (listWordsForUser && selected) {
-  //     const word = listWordsForUser.find(l => {
-  //       return (
-  //         l.id === selected.id &&
-  //         l.addFlashCards !== selected.addFlashCards
-  //       );
-  //     });
-  //     if (word) {
-  //       this.setState({ selected: null });
-  //     }
-  //   }
-
-  //   return true;
-  // }
-
   handleRequestSort = (event, property) => {
     const orderBy = property;
     let order = 'desc';
@@ -274,57 +251,17 @@ class ListaPalavrasPage extends React.Component {
     this.setState({ open: false });
   };
 
-  renderDialogEdit() {
-    const { open, selected } = this.state;
-    if (!selected) {
-      return null;
-    }
-    return (
-      <Dialog
-        open={open}
-        onClose={this.handleClose}
-        aria-labelledby="form-dialog-title"
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle id="form-dialog-title">Edit word</DialogTitle>
-        <DialogContent>
-          <DialogContentText>For more details for the word</DialogContentText>
-          <Typography variant="h4">Word: {selected.origin}</Typography>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            size="small"
-            color="secondary"
-            onClick={this.handleCloseDialog}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="primary"
-            onClick={this.handleCloseDialog}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
+  onSubmit = values => {
+    const { selected } = this.state;
+    const { onAddTextDescription, user } = this.props;
+    selected.translate = values.description;
+    onAddTextDescription({ word: selected, user });
+    this.handleCloseDialog();
+  };
 
   render() {
     const { classes, listWordsForUser } = this.props;
-    const { order, orderBy, rowsPerPage, page, selected } = this.state;
+    const { order, orderBy, rowsPerPage, page, selected, open } = this.state;
     if (!listWordsForUser) {
       return null;
     }
@@ -349,7 +286,15 @@ class ListaPalavrasPage extends React.Component {
 
     return (
       <div className={classes.root}>
-        {this.renderDialogEdit()}
+        {/* {this.renderDialogEdit()} */}
+        {open ? (
+          <EditTranslate
+            open={open}
+            handleCloseDialog={this.handleCloseDialog}
+            item={selected}
+            onSubmit={this.onSubmit}
+          />
+        ) : null}
         <div className={classes.divInner}>
           <Paper
             className={classes.paper}
@@ -405,7 +350,7 @@ class ListaPalavrasPage extends React.Component {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={listWordsForUser.length}
+            count={wordsKnows.words.length}
             rowsPerPage={rowsPerPage}
             page={page}
             backIconButtonProps={{
@@ -494,7 +439,8 @@ ListaPalavrasPage.propTypes = {
   onForgetWord: PropTypes.func.isRequired,
   onAddFlashCard: PropTypes.func.isRequired,
   onRemoveFlashCard: PropTypes.func.isRequired,
-  onFilterListWords: PropTypes.func.isRequired
+  onFilterListWords: PropTypes.func.isRequired,
+  onAddTextDescription: PropTypes.func.isRequired
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -513,7 +459,9 @@ const mapDispatchToProps = dispatch => ({
     dispatch(TextoActions.addFlashCardRequest(payload)),
   onRemoveFlashCard: payload =>
     dispatch(TextoActions.removeFlashCardRequest(payload)),
-  onFilterListWords: payload => dispatch(TextoActions.filterListWords(payload))
+  onFilterListWords: payload => dispatch(TextoActions.filterListWords(payload)),
+  onAddTextDescription: payload =>
+    dispatch(TextoActions.addTextDescriptionRequest(payload))
 });
 
 const connectListaPalavrasPage = connect(

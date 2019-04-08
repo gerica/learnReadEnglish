@@ -32,6 +32,7 @@ import CustomizedSnackbars from '../../Components/Snackbars/CustomizedSnackbars'
 import TitlePage from '../../Components/AppBar/TitlePage';
 import Routes from '../../Utils/routes';
 import { createValidator, required } from '../../Utils/validation';
+import EditTranslate from '../../Components/Dialog/editTranslate';
 
 const styles = theme => ({
   root: {
@@ -78,7 +79,7 @@ const styles = theme => ({
 });
 
 class HomePage extends Component {
-  state = { expanded: false };
+  state = { expanded: false, open: false, selected: null, stateMessage: null };
 
   componentWillMount() {
     const { onReset } = this.props;
@@ -88,6 +89,16 @@ class HomePage extends Component {
     // initialize({
     //   texto: 'It is easy to configure.'
     // });
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const { message, onResetMessage } = nextProps;
+
+    if (message) {
+      this.setState({ stateMessage: message });
+      onResetMessage();
+    }
+    return true;
   }
 
   onSubmit = values => {
@@ -126,6 +137,26 @@ class HomePage extends Component {
   handleAddFlashCard = word => {
     const { onDoneTextWordsRequest, user } = this.props;
     onDoneTextWordsRequest({ word: { ...word, addFlashCards: true }, user });
+  };
+
+  handleOpenDialog = word => {
+    this.setState({ open: true, selected: word });
+  };
+
+  handleCloseDialog = () => {
+    this.setState({ open: false, selected: null });
+  };
+
+  onHandleChangeMessage = () => {
+    this.setState({ stateMessage: null });
+  };
+
+  onSubmitEdit = values => {
+    const { selected } = this.state;
+    const { onAddTextBaseDescription, user } = this.props;
+    selected.translate = values.description;
+    onAddTextBaseDescription({ word: selected, user });
+    this.handleCloseDialog();
   };
 
   renderCards() {
@@ -241,7 +272,7 @@ class HomePage extends Component {
               color="primary"
               className={classes.button}
               aria-label="Add an alarm"
-              // onClick={() => this.handleAddFlashCard(w)}
+              onClick={() => this.handleOpenDialog(w)}
             >
               <Icon>more_vert</Icon>
             </IconButton>
@@ -265,8 +296,24 @@ class HomePage extends Component {
 
   render() {
     const { loading, error } = this.props;
+    const { open, selected, stateMessage } = this.state;
     return (
       <Fragment>
+        {open ? (
+          <EditTranslate
+            open={open}
+            handleCloseDialog={this.handleCloseDialog}
+            item={selected}
+            onSubmit={this.onSubmitEdit}
+          />
+        ) : null}
+        {stateMessage ? (
+          <CustomizedSnackbars
+            message={stateMessage}
+            variant="success"
+            onCleanMsg={this.onHandleChangeMessage}
+          />
+        ) : null}
         {error ? (
           <CustomizedSnackbars message={error.message} variant="error" />
         ) : null}
@@ -286,7 +333,10 @@ HomePage.propTypes = {
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   listWords: PropTypes.array,
   user: PropTypes.object,
-  text: PropTypes.string
+  text: PropTypes.string,
+  onAddTextBaseDescription: PropTypes.func,
+  onResetMessage: PropTypes.func,
+  message: PropTypes.string
 };
 
 HomePage.defaultProps = {
@@ -299,7 +349,7 @@ HomePage.defaultProps = {
 
 const mapStateToProps = createStructuredSelector({
   listWords: selectors.selectorListWords(),
-  // form: selectors.selectorForm(),
+  message: selectors.selectorMessage(),
   loading: selectors.selectorLoading(),
   error: selectors.selectorError(),
   user: selectorsSession.selectorSessionUser(),
@@ -311,7 +361,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(TextoActions.compileTextWordsRequest(papel)),
   onDoneTextWordsRequest: payload =>
     dispatch(TextoActions.doneTextWordsRequest(payload)),
-  onReset: () => dispatch(TextoActions.resetRedux())
+  onReset: () => dispatch(TextoActions.resetRedux()),
+  onAddTextBaseDescription: payload =>
+    dispatch(TextoActions.addTextBaseDescriptionRequest(payload)),
+  onResetMessage: () => dispatch(TextoActions.resetMessage())
 });
 
 const validate = createValidator({

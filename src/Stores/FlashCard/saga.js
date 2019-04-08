@@ -95,20 +95,20 @@ function* criarFlashCardsBaseTexto(payload, blackList) {
           })
         );
       } else {
-        while (listCard.length < 10) {
-          const item =
-            base.texts[Math.floor(Math.random() * base.texts.length)];
-          const jaExisi = listCard.find(e => e.word.id === item.id);
-          if (!jaExisi) {
-            listCard.push({
-              word: { ...item },
-              user: user.uid,
-              nextCheck: new Date(),
-              times: 0,
-              lastsNote: []
-            });
-          }
-        }
+        // while (listCard.length < 10) {
+        //   const item =
+        //     base.texts[Math.floor(Math.random() * base.texts.length)];
+        //   const jaExisi = listCard.find(e => e.word.id === item.id);
+        //   if (!jaExisi) {
+        //     listCard.push({
+        //       word: { ...item },
+        //       user: user.uid,
+        //       nextCheck: new Date(),
+        //       times: 0,
+        //       lastsNote: []
+        //     });
+        //   }
+        // }
       }
     });
 

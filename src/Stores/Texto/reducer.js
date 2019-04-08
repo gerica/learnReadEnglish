@@ -42,6 +42,11 @@ export const resetRedux = (state = INITIAL_STATE) => ({
   loading: false
   // listWordsForUser: null
 });
+// Reset
+export const resetMessage = (state = INITIAL_STATE) => ({
+  ...state,
+  message: null
+});
 
 export const compileTextWordsSuccess = (
   state = INITIAL_STATE,
@@ -96,7 +101,7 @@ export const fetchAllWordsForUserSuccess = (
 export const filterListWords = (state = INITIAL_STATE, { filter }) => {
   const { listWordsForUserOrigin } = state;
   let result;
-  const wordsForUser = listWordsForUserOrigin[0];
+  const wordsForUser = { ...listWordsForUserOrigin[0] };
 
   if (filter && filter.param && filter.param.length > 0) {
     const list = wordsForUser.words.filter(l => {
@@ -120,6 +125,7 @@ export const filterListWords = (state = INITIAL_STATE, { filter }) => {
 const perfilReducer = createReducer(INITIAL_STATE, {
   // RESET
   [TextoTypes.RESET_REDUX]: resetRedux,
+  [TextoTypes.RESET_MESSAGE]: resetMessage,
   [TextoTypes.SUCCESS]: success,
   [TextoTypes.FAILURE]: failure,
 
@@ -135,7 +141,9 @@ const perfilReducer = createReducer(INITIAL_STATE, {
   [TextoTypes.FORGET_WORD_REQUEST]: request,
   [TextoTypes.ADD_FLASH_CARD_REQUEST]: request,
   [TextoTypes.REMOVE_FLASH_CARD_REQUEST]: request,
-  [TextoTypes.FILTER_LIST_WORDS]: filterListWords
+  [TextoTypes.FILTER_LIST_WORDS]: filterListWords,
+  [TextoTypes.ADD_TEXT_DESCRIPTION_REQUEST]: request,
+  [TextoTypes.ADD_TEXT_BASE_DESCRIPTION_REQUEST]: request
 });
 
 export default perfilReducer;

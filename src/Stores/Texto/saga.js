@@ -276,6 +276,68 @@ function* doneTextWordsRequest({ payload }) {
   }
 }
 
+function* addTextDescriptionRequest({ payload }) {
+  try {
+    const { word, user } = payload;
+
+    const list = yield call(
+      [FbTextoUsuarioService, FbTextoUsuarioService.fetchByUser],
+      payload
+    );
+
+    const wordsKnows = list[0];
+    const changeWord = wordsKnows.words.find(w => w.origin === word.origin);
+    changeWord.translate = word.translate;
+    yield call(
+      [FbTextoUsuarioService, FbTextoUsuarioService.update],
+      wordsKnows
+    );
+
+    yield put(
+      TextoActions.fetchAllWordsForUserRequest({
+        user,
+        msg: MSG_001
+      })
+    );
+  } catch (err) {
+    console.log({ err });
+    yield put(TextoActions.failure(err));
+  }
+}
+
+function* addTextBaseDescriptionRequest({ payload }) {
+  try {
+    const { word, user } = payload;
+
+    const baseTexto = yield call([FbTextoService, FbTextoService.fetchAll]);
+
+    // const wordsKnows = baseTexto[0];
+    let wordsKnows;
+    for (let index = 0; index < baseTexto.length; index++) {
+      const changeWord = baseTexto[index].texts.find(
+        w => w.origin === word.origin
+      );
+      if (changeWord) {
+        changeWord.translate = word.translate;
+        wordsKnows = baseTexto[index];
+        break;
+      }
+    }
+
+    yield call([FbTextoService, FbTextoService.update], wordsKnows);
+
+    yield put(
+      TextoActions.fetchAllWordsForUserRequest({
+        user,
+        msg: MSG_001
+      })
+    );
+  } catch (err) {
+    console.log({ err });
+    yield put(TextoActions.failure(err));
+  }
+}
+
 export function* watchTranslateWords() {
   yield takeLatest(TextoTypes.COMPILE_TEXT_WORDS_REQUEST, translateWords);
 }
@@ -306,6 +368,20 @@ export function* watchRemoveFlashCardRequest() {
   );
 }
 
+export function* watchAddTextDescription() {
+  yield takeLatest(
+    TextoTypes.ADD_TEXT_DESCRIPTION_REQUEST,
+    addTextDescriptionRequest
+  );
+}
+
+export function* watchAddTextBaseDescription() {
+  yield takeLatest(
+    TextoTypes.ADD_TEXT_BASE_DESCRIPTION_REQUEST,
+    addTextBaseDescriptionRequest
+  );
+}
+
 export default function* saga() {
   yield all([
     watchTranslateWords(),
@@ -313,6 +389,8 @@ export default function* saga() {
     watchFetchAllWordsForUserRequest(),
     watchForgetWordRequest(),
     watchAddFlashCardRequest(),
-    watchRemoveFlashCardRequest()
+    watchRemoveFlashCardRequest(),
+    watchAddTextDescription(),
+    watchAddTextBaseDescription()
   ]);
 }
